@@ -1,0 +1,48 @@
+package com.ddokdoghotdog.gowalk.global.exception;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public enum ErrorCode {
+
+    /* Business Exceptions */
+    // 400 BAD REQUEST
+    INVALID_INPUT_VALUE("유효하지 않은 입력값입니다.", 400),
+    TYPE_MISMATCH("입력된 enum값이 유효하지 않습니다.", 400),
+    METHOD_NOT_ALLOWED("유효하지 않은 HTTP method입니다.", 400),
+    MISSING_REQUEST_HEADER("HTTP 요청 헤더에 인증 값이 존재하지 않습니다.", 400),
+    INVALID_IMAGE_FILE_TYPE("유효하지 않은 확장자입니다. 이미지 파일만 업로드 가능합니다.", 400),
+    ILLEGAL_REGISTRATION_ID("유효하지 않은 OAuth Id입니다.", 400),
+
+    // 401 Unauthorized
+    EXPIRED_TOKEN("만료된 토큰입니다. 재로그인이 필요합니다.", 401),
+    LOGIN_REQUIRED("로그인이 필요합니다.", 401),
+    INVALID_TOKEN("올바르지 않은 토큰입니다.", 401),
+    INVALID_JWT_SIGNATURE("잘못된 JWT 시그니처입니다.", 401),
+
+    // 403 FORBIDDEN
+    NO_PERMISSION("권한이 없습니다.", 403),
+
+    // 404 NOT FOUND
+    MEMBER_NOT_FOUND("존재하지 않는 사용자 ID입니다.", 404),
+    REVIEW_NOT_FOUND("존재하지 않는 댓글 ID입니다.", 404),
+    ORDER_NOT_FOUND("존재하지 않는 주문 ID입니다.", 404),
+    CM_CODE_NOT_FOUND("존재하지 않는 공통코드값입니다.", 404),
+    ENTITY_NOT_FOUND("존재하지 않는 엔티티입니다.", 404), // 왠만하면 not found 만들어주세요.
+
+    // 406 Not Acceptable
+    INVALID_PHONE_NUMBER("유효하지 않은 휴대폰번호입니다.", 406),
+
+    // 500 INTERNAL SERVER ERROR
+    DB_QUERY_EXECUTION_ERROR("쿼리가 정상적으로 완료되지 않았습니다.", 500),
+    AWS_S3_UPLOAD_ERROR("AWS S3 이미지 업로드에 실패하였습니다.", 500),
+
+    /* Spring Basic Exceptions */
+    INTERNAL_SERVER_ERROR("서버 오류가 발생했습니다.", 500);
+
+    private final String message;
+    private final int status;
+
+}
