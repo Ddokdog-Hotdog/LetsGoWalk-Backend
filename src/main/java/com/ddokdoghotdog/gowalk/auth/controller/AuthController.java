@@ -24,7 +24,7 @@ public class AuthController {
     private final MemberRepository memberRepository;
 
     @GetMapping("/success")
-    public ResponseEntity<String> loginSuccess(@RequestParam String accessToken) {
+    public ResponseEntity<String> loginSuccess(@RequestParam("accessToken") String accessToken) {
         return ResponseEntity.ok(accessToken);
     }
 
