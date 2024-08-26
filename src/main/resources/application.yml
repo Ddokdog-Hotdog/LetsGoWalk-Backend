@@ -24,6 +24,8 @@ spring:
             host:
             port: 6379
             password:
+        mongodb:
+            uri:
 
     security:
         oauth2:
