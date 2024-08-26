@@ -1,4 +1,4 @@
-package com.ddokdoghotdog.gowalk.auth.entity;
+package com.ddokdoghotdog.gowalk.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

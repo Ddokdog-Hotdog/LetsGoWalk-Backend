@@ -9,7 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import com.ddokdoghotdog.gowalk.auth.entity.Member;
+import com.ddokdoghotdog.gowalk.entity.Member;
 
 import lombok.AllArgsConstructor;
 
