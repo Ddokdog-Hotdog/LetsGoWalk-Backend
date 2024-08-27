@@ -5,16 +5,18 @@ import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Document(collection = "walk_paths")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Document(collection = "walk_paths")
+@CompoundIndex(name = "location_2dsphere", def = "{'paths.location': '2dsphere'}")
 public class WalkPaths {
     @Id
     private String id;
