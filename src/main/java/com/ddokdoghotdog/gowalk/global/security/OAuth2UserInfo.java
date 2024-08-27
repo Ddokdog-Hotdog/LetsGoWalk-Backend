@@ -68,7 +68,7 @@ public class OAuth2UserInfo {
                 .email(email)
                 .socialProvider(provider)
                 .profileImageUrl(profile)
-                .role(Role.USER)
+                .role(1L)
                 .memberKey(UUID.randomUUID().toString().replace("-", ""))
                 .build();
     }
