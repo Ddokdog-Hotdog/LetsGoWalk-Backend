@@ -1,16 +1,18 @@
 package com.ddokdoghotdog.gowalk.entity;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 
 import com.ddokdoghotdog.gowalk.global.entity.BaseTimeEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,37 +24,39 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@Table(name = "members")
 public class Member extends BaseTimeEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(nullable = false, length = 20)
-    private String nickname;
+//	@ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "roleid", nullable = false)
+    private Long role;
 
-    @Column(nullable = false, length = 50)
+    @Column(name = "email", nullable = false, length = 50)
     private String email;
 
-    @Column(nullable = false)
-    @Enumerated(value = EnumType.STRING)
-    private Role role;
+    @Column(name = "nickname", nullable = false, length = 20)
+    private String nickname;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "memberkey", nullable = false)
     private String memberKey;
 
-    @Column(nullable = false)
+    @Column(name = "socialprovider", nullable = false)
     private String socialProvider;
 
-    @Column(nullable = true)
+    @Column(name = "prifileimageurl")
     private String profileImageUrl;
 
-    @Column()
-    private Timestamp dateOfBirth;
+    @Column(name = "dateofbirth")
+    private Date dateOfBirth;
 
-    @Column()
-    private String gender;
+    @Column(name = "gender")
+    private Boolean gender;
 
-    @Column()
-    private int point;
+    @Column(name = "point", nullable = false)
+    private Long point;
 }
