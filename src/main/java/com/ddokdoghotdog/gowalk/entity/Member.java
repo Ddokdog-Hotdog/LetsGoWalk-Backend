@@ -55,7 +55,7 @@ public class Member extends BaseTimeEntity {
     private Date dateOfBirth;
 
     @Column(name = "gender")
-    private Boolean gender;
+    private String gender;
 
     @Column(name = "point", nullable = false)
     private Long point;
