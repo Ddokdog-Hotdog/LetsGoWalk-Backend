@@ -27,14 +27,14 @@ import lombok.NoArgsConstructor;
 @Table(name = "members")
 public class Member extends BaseTimeEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-//	@ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "roleid", nullable = false)
-    private Long role;
+    private UserRole role;
 
     @Column(name = "email", nullable = false, length = 50)
     private String email;
