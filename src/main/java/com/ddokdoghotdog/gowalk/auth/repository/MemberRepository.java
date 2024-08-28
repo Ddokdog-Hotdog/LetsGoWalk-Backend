@@ -1,4 +1,4 @@
-package com.ddokdoghotdog.gowalk.auth;
+package com.ddokdoghotdog.gowalk.auth.repository;
 
 import java.util.Optional;
 
