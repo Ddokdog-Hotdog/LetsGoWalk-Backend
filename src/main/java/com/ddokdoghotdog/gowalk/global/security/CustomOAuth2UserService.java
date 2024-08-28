@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ddokdoghotdog.gowalk.auth.MemberRepository;
 import com.ddokdoghotdog.gowalk.auth.dto.PrincipalDetails;
-import com.ddokdoghotdog.gowalk.auth.entity.Member;
+import com.ddokdoghotdog.gowalk.entity.Member;
 
 import lombok.RequiredArgsConstructor;
 

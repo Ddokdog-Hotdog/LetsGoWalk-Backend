@@ -3,8 +3,8 @@ package com.ddokdoghotdog.gowalk.global.security;
 import java.util.Map;
 import java.util.UUID;
 
-import com.ddokdoghotdog.gowalk.auth.entity.Member;
-import com.ddokdoghotdog.gowalk.auth.entity.Role;
+import com.ddokdoghotdog.gowalk.entity.Member;
+import com.ddokdoghotdog.gowalk.entity.Role;
 import com.ddokdoghotdog.gowalk.global.exception.BusinessException;
 import com.ddokdoghotdog.gowalk.global.exception.ErrorCode;
 
@@ -68,7 +68,7 @@ public class OAuth2UserInfo {
                 .email(email)
                 .socialProvider(provider)
                 .profileImageUrl(profile)
-                .role(Role.USER)
+                .role(1L)
                 .memberKey(UUID.randomUUID().toString().replace("-", ""))
                 .build();
     }
