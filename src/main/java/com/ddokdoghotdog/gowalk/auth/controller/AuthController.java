@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ddokdoghotdog.gowalk.auth.MemberRepository;
+import com.ddokdoghotdog.gowalk.auth.repository.MemberRepository;
 import com.ddokdoghotdog.gowalk.global.jwt.TokenService;
 
 import lombok.RequiredArgsConstructor;

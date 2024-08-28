@@ -5,17 +5,24 @@ spring:
         active: dev
         group:
             dev: dev, secret
-            blue: blue, secret
-            green: green, secret
+            blue: blue, secret, prod
+            green: green, secret, prod
     datasource:
         url:
         username:
         password:
         driver-class-name:
+
+    decorator:
+        datasource:
+            p6spy:
+            enable-logging: true
+
     jpa:
         hibernate:
             ddl-auto: update
-        show-sql: true
+        # show-sql: true
+        show-sql: false
         properties:
             hibernate:
 
@@ -94,8 +101,7 @@ spring:
 
 server:
     port: 8080
-custom:
-    baseUrl: https://api.ddokdoghotdog.shop
+
 serverName: blue_server
 
 ---
@@ -105,9 +111,20 @@ spring:
             on-profile: green
 server:
     port: 8081
+
+serverName: green_server
+
+---
+spring:
+    config:
+        activate:
+            on-profile: prod
+    decorator:
+        datasource:
+            p6spy:
+                enable-logging: false
 custom:
     baseUrl: https://api.ddokdoghotdog.shop
-serverName: green_server
 
 ---
 

@@ -35,7 +35,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'mysql:mysql-connector-java:8.0.30'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	
+	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.2'
+
 	//jwt
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
