@@ -2,7 +2,9 @@ package com.ddokdoghotdog.gowalk.pet.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +25,19 @@ public class PetController {
     private final MemberService memberService;
 
     @PostMapping("")
-    public ResponseEntity<PetDTO.Response> createPet(@RequestBody PetDTO.CreateRequest petDTO) {
-        return new ResponseEntity<>(petWriteService.createPet(petDTO), HttpStatus.CREATED);
+    public ResponseEntity<PetDTO.Response> createPet(@RequestBody PetDTO.CreateRequest petCreateRequestDTO) {
+        return new ResponseEntity<>(petWriteService.createPet(petCreateRequestDTO), HttpStatus.CREATED);
+    }
+
+    @PutMapping("")
+    public ResponseEntity<PetDTO.Response> updatePet(@RequestBody PetDTO.Update petUpdateRequsetDTO) {
+        return new ResponseEntity<>(petWriteService.updatePet(petUpdateRequsetDTO), HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("")
+    // public ResponseEntity<List<PetDTO.Response>> getPetsByMember(Principal
+    // principal) {
+    public ResponseEntity<String> getPetsByMember() {
+        return new ResponseEntity<>("하이", HttpStatus.OK);
     }
 }

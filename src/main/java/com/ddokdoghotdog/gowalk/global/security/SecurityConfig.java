@@ -43,6 +43,7 @@ public class SecurityConfig {
                                                 .requestMatchers("/auth/success").permitAll()
                                                 .requestMatchers("/error", "/favicon.ico").permitAll()
                                                 .requestMatchers("/", "/hc", "/env").permitAll()
+                                                // .requestMatchers("api/mypage/pets").hasRole("ADMIN")
                                                 // .anyRequest().authenticated())
                                                 .anyRequest().permitAll())
 
