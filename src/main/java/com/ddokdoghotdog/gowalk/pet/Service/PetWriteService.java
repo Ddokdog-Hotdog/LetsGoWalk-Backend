@@ -1,0 +1,40 @@
+package com.ddokdoghotdog.gowalk.pet.Service;
+
+import org.springframework.stereotype.Service;
+
+import com.ddokdoghotdog.gowalk.entity.Breed;
+import com.ddokdoghotdog.gowalk.entity.Member;
+import com.ddokdoghotdog.gowalk.entity.Pet;
+import com.ddokdoghotdog.gowalk.pet.dto.PetDTO;
+import com.ddokdoghotdog.gowalk.pet.repository.PetRepository;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Service
+public class PetWriteService {
+    private final PetRepository petRepository;
+    private final PetReadService petReadService;
+
+    @Transactional
+    public PetDTO.Response createPet(PetDTO.CreateRequest petCreateRequestDTO) {
+        Member member = Member.builder().id(petCreateRequestDTO.getMemberId()).build();
+        Breed breed = petReadService.getBreedById(petCreateRequestDTO.getBreedId());
+        Pet pet = petCreateRequestDTO.toEntity(member, breed);
+        petRepository.save(pet);
+
+        return PetDTO.Response.of(pet);
+
+    };
+
+    @Transactional
+    public PetDTO.Response updatePet(PetDTO.Update petUpdateRequsetDTO) {
+        Pet pet = petReadService.getPetById(petUpdateRequsetDTO.getPetId());
+        Breed breed = petReadService.getBreedById(petUpdateRequsetDTO.getBreedId());
+        pet.updatePet(petUpdateRequsetDTO, breed);
+        petRepository.save(pet);
+
+        return PetDTO.Response.of(pet);
+    }
+}
