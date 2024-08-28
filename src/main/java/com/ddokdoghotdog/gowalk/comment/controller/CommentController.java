@@ -1,0 +1,8 @@
+package com.ddokdoghotdog.gowalk.comment.controller;
+
+import org.springframework.stereotype.Controller;
+
+@Controller
+public class CommentController {
+
+}

@@ -31,6 +31,8 @@ public enum ErrorCode {
     ORDER_NOT_FOUND("존재하지 않는 주문 ID입니다.", 404),
     CM_CODE_NOT_FOUND("존재하지 않는 공통코드값입니다.", 404),
     ENTITY_NOT_FOUND("존재하지 않는 엔티티입니다.", 404), // 왠만하면 not found 만들어주세요.
+    MEMBER_NICKNAME_NOT_FOUND("존재하지 않는 사용자 닉네임입니다.", 404),
+    POST_NOT_FOUND("존재하지 않는 게시글입니다.", 404),
 
     // 406 Not Acceptable
     INVALID_PHONE_NUMBER("유효하지 않은 휴대폰번호입니다.", 406),
