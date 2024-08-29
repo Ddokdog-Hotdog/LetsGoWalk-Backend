@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ddokdoghotdog.gowalk.entity.Member;
 import com.ddokdoghotdog.gowalk.entity.Pet;
@@ -13,7 +17,14 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
     @Override
     Optional<Pet> findById(Long id);
 
+    Optional<Pet> findByIdAndMemberId(@Param("id") Long id, @Param("memberid") Long memberId);
+
     List<Pet> findByMember(Member member);
 
     List<Pet> findByMemberId(Long memberId);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Pet p WHERE p.id = :id AND p.member.id = :memberId")
+    void deleteByPetIdAndMemberId(@Param("id") Long id, @Param("memberId") Long memberId);
 }

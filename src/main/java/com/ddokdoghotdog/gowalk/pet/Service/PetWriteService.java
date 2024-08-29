@@ -29,11 +29,17 @@ public class PetWriteService {
 
     @Transactional
     public PetDTO.Response updatePet(PetDTO.Update petUpdateRequsetDTO) {
-        Pet pet = petReadService.getPetById(petUpdateRequsetDTO.getPetId());
-        Breed breed = petReadService.getBreedById(petUpdateRequsetDTO.getBreedId());
+        Pet pet = petReadService.getPetByIdAndMemberId(petUpdateRequsetDTO.getPetId(),
+                petUpdateRequsetDTO.getMemberId());
+        Breed breed = Breed.builder().id(petUpdateRequsetDTO.getBreedId()).build();
         pet.updatePet(petUpdateRequsetDTO, breed);
         petRepository.save(pet);
 
         return PetDTO.Response.of(pet);
+    }
+
+    @Transactional
+    public void deletePet(Long petId, Long memberId) {
+        petRepository.deleteByPetIdAndMemberId(petId, memberId);
     }
 }
