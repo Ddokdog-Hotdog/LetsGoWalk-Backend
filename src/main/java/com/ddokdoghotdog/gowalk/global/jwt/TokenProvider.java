@@ -16,6 +16,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.ddokdoghotdog.gowalk.auth.dto.PrincipalDetails;
+import com.ddokdoghotdog.gowalk.entity.Member;
 import com.ddokdoghotdog.gowalk.global.exception.ErrorCode;
 import com.ddokdoghotdog.gowalk.global.exception.TokenException;
 
@@ -40,6 +42,7 @@ public class TokenProvider {
     @Value("${jwt.refresh}")
     private long REFRESH_TOKEN_EXPIRE_TIME; // 7일
     private static final String KEY_ROLE = "role";
+    private static final String KEY_MEMBERID = "memberId";
     private final TokenService tokenService;
 
     @PostConstruct
@@ -59,6 +62,8 @@ public class TokenProvider {
     private String generateToken(Authentication authentication, long expireTime) {
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + expireTime);
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        Member member = principalDetails.getMember();
 
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -67,6 +72,7 @@ public class TokenProvider {
         return Jwts.builder()
                 .subject(authentication.getName())
                 .claim(KEY_ROLE, authorities)
+                .claim(KEY_MEMBERID, String.valueOf(member.getId()))
                 .issuedAt(now)
                 .expiration(expiredDate)
                 .signWith(secretKey, Jwts.SIG.HS512)
@@ -76,8 +82,9 @@ public class TokenProvider {
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);
         List<SimpleGrantedAuthority> authorities = getAuthorities(claims);
-
-        User principal = new User(claims.getSubject(), "", authorities);
+        String memberId = claims.get(KEY_MEMBERID).toString();
+        // User principal = new User(claims.getSubject(), "", authorities);
+        User principal = new User(memberId, "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, token,
                 authorities);
     }
