@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ddokdoghotdog.gowalk.product.ProductService;
 import com.ddokdoghotdog.gowalk.product.dto.ShopItemDeleteDTO;
 import com.ddokdoghotdog.gowalk.product.dto.ShopItemRegisterRequestDTO;
 import com.ddokdoghotdog.gowalk.product.dto.ShopItemUpdateRequestDTO;
+import com.ddokdoghotdog.gowalk.product.service.ProductService;
 
 import lombok.extern.slf4j.Slf4j;
 

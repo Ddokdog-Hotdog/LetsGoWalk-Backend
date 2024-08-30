@@ -9,7 +9,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ddokdoghotdog.gowalk.auth.MemberRepository;
+import com.ddokdoghotdog.gowalk.auth.repository.MemberRepository;
 import com.ddokdoghotdog.gowalk.cart.dto.ShopCartsRequestDTO;
 import com.ddokdoghotdog.gowalk.cart.dto.ShopCartsUpdateRequestDTO;
 import com.ddokdoghotdog.gowalk.cart.repository.CartRepository;
