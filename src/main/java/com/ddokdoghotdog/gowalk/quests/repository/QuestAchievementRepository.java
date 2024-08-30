@@ -12,4 +12,6 @@ import com.ddokdoghotdog.gowalk.entity.QuestAchievement.QuestAchievementId;
 @Repository
 public interface QuestAchievementRepository extends JpaRepository<QuestAchievement, QuestAchievementId> {
     List<QuestAchievement> findByMemberIdAndRewardDate(Long memberId, Date rewardDate);
+
+	void deleteByIsRewardedFalse();
 }

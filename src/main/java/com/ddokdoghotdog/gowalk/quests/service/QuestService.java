@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,18 +39,15 @@ public class QuestService {
         return result;   
     }
     
-    // 오늘의 퀘스트 상태 조회
     public List<QuestAchievement> getTodayAchievements(Long memberId) {
         Date today = new Date(System.currentTimeMillis());
         return questAchievementRepository.findByMemberIdAndRewardDate(memberId, today);
     }
 
-    // 모든 퀘스트 조회
     public List<Quest> getAllQuests() {
         return questRepository.findAll();
     }
 
-    // 포인트 받기 처리
     @Transactional
     public void rewardPoints(Long memberId, Long questId) {
 
@@ -73,6 +71,12 @@ public class QuestService {
                 questAchievementRepository.save(achievement);
             }
         }
+    }
+    
+    @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
+    public void deleteUnrewardedAchievements() {
+        questAchievementRepository.deleteByIsRewardedFalse();
     }
 
 }
