@@ -42,5 +42,8 @@ public class Payment {
 
     @Column(name = "pointamount", nullable = false)
     private Long pointAmount;
+    
+    @Column(name = "kakaoid", nullable = false)
+    private String kakaoOrderId;
 
 }
