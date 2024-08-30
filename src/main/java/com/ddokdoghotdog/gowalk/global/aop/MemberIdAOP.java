@@ -9,8 +9,11 @@ import org.springframework.stereotype.Component;
 
 import com.ddokdoghotdog.gowalk.global.entity.BaseMemberIdDTO;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
 @Aspect
+@Slf4j
 public class MemberIdAOP {
 
     @Around("execution(* com.ddokdoghotdog.gowalk..controller..*(..))")
@@ -26,10 +29,10 @@ public class MemberIdAOP {
                         Long memberId = Long.parseLong(name);
                         dto.setMemberId(memberId);
                     } catch (NumberFormatException e) {
-                        System.out.println("Failed to parse memberId: " + name);
+                        log.info("Failed to parse memberId: " + name);
                     }
                 } else {
-                    System.out.println("Authentication is null or not authenticated");
+                    log.info("Authentication is null or not authenticated");
                 }
             }
         }

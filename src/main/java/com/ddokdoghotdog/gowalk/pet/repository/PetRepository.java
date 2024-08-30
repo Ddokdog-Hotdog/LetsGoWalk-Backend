@@ -23,6 +23,9 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
 
     List<Pet> findByMemberId(Long memberId);
 
+    @Query("SELECT p FROM Pet p JOIN FETCH p.breed WHERE p.id IN :ids AND p.member.id = :memberId")
+    List<Pet> findAllByIdInAndMemberId(@Param("ids") List<Long> ids, @Param("memberId") Long memberId);
+
     @Modifying
     @Transactional
     @Query("DELETE FROM Pet p WHERE p.id = :id AND p.member.id = :memberId")

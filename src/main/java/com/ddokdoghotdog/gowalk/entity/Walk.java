@@ -1,6 +1,6 @@
 package com.ddokdoghotdog.gowalk.entity;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,10 +32,10 @@ public class Walk {
     private Long id;
 
     @Column(name = "starttime")
-    private Date startTime;
+    private Timestamp startTime;
 
     @Column(name = "endtime")
-    private Date endTime;
+    private Timestamp endTime;
 
     @Column(name = "total_distance")
     private Long totalDistance;
@@ -44,13 +44,15 @@ public class Walk {
     private Double totalCalories;
 
     @OneToMany(mappedBy = "walk", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<PetWalk> petWalks = new HashSet<>();
 
     public void addPet(Pet pet) {
         PetWalk petWalk = PetWalk.builder()
                 .pet(pet)
+                .walk(this)
                 .build();
         petWalks.add(petWalk);
-        pet.getPetWalks().add(petWalk);
+
     }
 }
