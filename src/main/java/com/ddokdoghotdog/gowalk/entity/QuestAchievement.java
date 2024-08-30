@@ -15,10 +15,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @AllArgsConstructor
 @Builder
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "questachievements")
@@ -44,6 +46,7 @@ public class QuestAchievement {
     private Date rewardDate;
 
     @Embeddable
+    @Setter
     public static class QuestAchievementId {
         private Long memberid;
         private Long questid;
