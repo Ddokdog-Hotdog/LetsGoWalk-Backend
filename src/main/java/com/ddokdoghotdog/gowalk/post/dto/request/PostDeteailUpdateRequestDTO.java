@@ -1,5 +1,7 @@
 package com.ddokdoghotdog.gowalk.post.dto.request;
 
+import java.sql.Timestamp;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,8 +13,12 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostDetailDeleteRequestDTO {
-
-    private Long postsid;
-
+public class PostDeteailUpdateRequestDTO {
+	
+	private Long postid;
+	private String title;
+	private String content;
+	private Timestamp updatedAt;
+	private String imgUrl;
+	
 }

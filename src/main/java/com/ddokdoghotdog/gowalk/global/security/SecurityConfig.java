@@ -43,9 +43,8 @@ public class SecurityConfig {
                                                 .requestMatchers("/auth/success").permitAll()
                                                 .requestMatchers("/error", "/favicon.ico").permitAll()
                                                 .requestMatchers("/", "/hc", "/envs").permitAll()
-                                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                                                .anyRequest().authenticated())
-                                // .anyRequest().permitAll())
+//                                                .anyRequest().authenticated())
+                                 .anyRequest().permitAll())
 
                                 .oauth2Login(oauth -> oauth.userInfoEndpoint(c -> c.userService(oAuth2UserService))
                                                 .successHandler(oAuth2SuccessHandler)
