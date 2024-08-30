@@ -5,6 +5,7 @@ import java.sql.Date;
 import com.ddokdoghotdog.gowalk.entity.Breed;
 import com.ddokdoghotdog.gowalk.entity.Member;
 import com.ddokdoghotdog.gowalk.entity.Pet;
+import com.ddokdoghotdog.gowalk.global.entity.BaseMemberIdDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,8 +18,7 @@ public class PetDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateRequest {
-        private Long memberId;
+    public static class CreateRequest extends BaseMemberIdDTO {
         private Long breedId;
         private String name;
         private Date dateOfBirth;
@@ -45,7 +45,7 @@ public class PetDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Update {
+    public static class Update extends BaseMemberIdDTO {
         private Long petId;
         private Long breedId;
         private String name;

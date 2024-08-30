@@ -29,5 +29,11 @@ public class WalkPaths {
     public static class PathPoint {
         private Date recordTime;
         private GeoJsonPoint location;
+
+        // GeoJsonPoint longitude latitude 반대로!
+        public static PathPoint from(double latitude, double longitude) {
+            GeoJsonPoint geoJsonPoint = new GeoJsonPoint(longitude, latitude);
+            return new PathPoint(new Date(), geoJsonPoint);
+        }
     }
 }
