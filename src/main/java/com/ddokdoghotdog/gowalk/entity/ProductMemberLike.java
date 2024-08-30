@@ -14,9 +14,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @AllArgsConstructor
 @Builder
+@Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -36,6 +38,8 @@ public class ProductMemberLike {
     @JoinColumn(name = "memberid", nullable = false)
     private Member member;
 
+    @Setter
+    @Getter
     @Embeddable
     public static class ProductMemberLikeId {
         private Long productid;

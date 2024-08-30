@@ -39,4 +39,7 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "memberid", nullable = false)
     private Member member;
+    
+    @Column(name = "kakaoid", nullable = false)
+    private String kakaoOrderId;
 }
