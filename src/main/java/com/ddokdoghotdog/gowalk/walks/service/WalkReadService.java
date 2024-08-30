@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ddokdoghotdog.gowalk.walks.model.WalkPaths;
 import com.ddokdoghotdog.gowalk.walks.repository.WalkPathsRepository;
@@ -11,14 +12,10 @@ import com.ddokdoghotdog.gowalk.walks.repository.WalkPathsRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
-public class WalkService {
-
+public class WalkReadService {
     private final WalkPathsRepository repository;
-
-    public WalkPaths saveWalk(WalkPaths walk) {
-        return repository.save(walk);
-    }
 
     public List<WalkPaths> getAllWalks() {
         return repository.findAll();
@@ -28,7 +25,4 @@ public class WalkService {
         return repository.findById(id);
     }
 
-    public void deleteWalk(String id) {
-        repository.deleteById(id);
-    }
 }
