@@ -43,8 +43,10 @@ public class SecurityConfig {
                                                 .requestMatchers("/auth/success").permitAll()
                                                 .requestMatchers("/error", "/favicon.ico").permitAll()
                                                 .requestMatchers("/", "/hc", "/env").permitAll()
-                                                //.anyRequest().authenticated())
-                                 .anyRequest().permitAll())
+                                                // .requestMatchers("api/mypage/pets").hasRole("ADMIN")
+                                                // .anyRequest().authenticated())
+                                                .anyRequest().permitAll())
+
 
                                 .oauth2Login(oauth -> oauth.userInfoEndpoint(c -> c.userService(oAuth2UserService))
                                                 .successHandler(oAuth2SuccessHandler)

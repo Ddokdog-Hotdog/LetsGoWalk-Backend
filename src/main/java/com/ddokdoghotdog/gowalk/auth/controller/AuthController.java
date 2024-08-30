@@ -1,5 +1,6 @@
 package com.ddokdoghotdog.gowalk.auth.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,7 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ddokdoghotdog.gowalk.auth.MemberRepository;
+import com.ddokdoghotdog.gowalk.auth.repository.MemberRepository;
+import com.ddokdoghotdog.gowalk.entity.Member;
 import com.ddokdoghotdog.gowalk.global.jwt.TokenService;
 
 import lombok.RequiredArgsConstructor;
@@ -34,12 +36,12 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/info")
-    public String myInfoTest() {
+    @GetMapping("/info") // 테스트용 구현할때 지워주세용
+    public ResponseEntity<Member> myInfoTest() {
 
-        // memberRepository.findByEmailAndSocialProvider(email, provider)
+        Member member = memberRepository.findById(1L).get();
 
-        return new String("asd");
+        return new ResponseEntity<>(member, HttpStatus.OK);
     }
 
 }

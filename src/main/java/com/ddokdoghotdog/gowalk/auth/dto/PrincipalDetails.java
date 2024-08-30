@@ -12,8 +12,10 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import com.ddokdoghotdog.gowalk.entity.Member;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @AllArgsConstructor
+@Getter
 public class PrincipalDetails implements OAuth2User, UserDetails {
     private final Member member;
     private final Map<String, Object> attributes;
@@ -27,8 +29,8 @@ public class PrincipalDetails implements OAuth2User, UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(
-//                new SimpleGrantedAuthority(member.getRole().getAuthority()));
-        		new SimpleGrantedAuthority("UserRole"));
+                new SimpleGrantedAuthority(member.getRole().getRole()));
+        // new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
@@ -65,4 +67,5 @@ public class PrincipalDetails implements OAuth2User, UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }
