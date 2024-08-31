@@ -20,16 +20,19 @@ public class WalkRedisService {
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String, String> redisTemplate;
     private final int TTL = 24;
+    private final String WALK_KEY = "walk";
+    private final String ROUTE_KEY = "route";
+    private final String ROUTE_COUNT_KEY = "routeCount";
 
     public void initPath(Long walkId, PathPoint initialLocation) throws JsonProcessingException {
-        String key = "walk:" + walkId + ":route1";
+        String key = walkBaseKey(walkId) + "1";
         String locationJson = objectMapper.writeValueAsString(List.of(initialLocation));
         redisTemplate.opsForValue().set(key, locationJson, TTL, TimeUnit.HOURS);
     }
 
     public void updateWalkPath(Long walkId, List<PathPoint> newPoints) throws JsonProcessingException {
-        String baseKey = "walk:" + walkId + ":route";
-        String countKey = "walk:" + walkId + ":routeCount";
+        String baseKey = walkBaseKey(walkId);
+        String countKey = walkCountKey(walkId);
 
         // 현재 route 번호 가져오기
         String countStr = redisTemplate.opsForValue().get(countKey);
@@ -44,8 +47,8 @@ public class WalkRedisService {
 
     public List<PathPoint> getAllPathPoints(Long walkId) throws JsonProcessingException {
         List<PathPoint> allPoints = new ArrayList<>();
-        String baseKey = "walk:" + walkId + ":route";
-        String countKey = "walk:" + walkId + ":routeCount";
+        String baseKey = walkBaseKey(walkId);
+        String countKey = walkCountKey(walkId);
 
         String countStr = redisTemplate.opsForValue().get(countKey);
         int count = (countStr == null) ? 0 : Integer.parseInt(countStr);
@@ -64,8 +67,8 @@ public class WalkRedisService {
     }
 
     public void cleanupRedisData(Long walkId) {
-        String baseKey = "walk:" + walkId + ":route";
-        String countKey = "walk:" + walkId + ":routeCount";
+        String baseKey = walkBaseKey(walkId);
+        String countKey = walkCountKey(walkId);
 
         String countStr = redisTemplate.opsForValue().get(countKey);
         int count = (countStr == null) ? 0 : Integer.parseInt(countStr);
@@ -75,5 +78,13 @@ public class WalkRedisService {
             redisTemplate.delete(key);
         }
         redisTemplate.delete(countKey);
+    }
+
+    private String walkBaseKey(Long walkId) {
+        return WALK_KEY + ":" + walkId + ":" + ROUTE_KEY;
+    }
+
+    private String walkCountKey(Long walkId) {
+        return WALK_KEY + ":" + walkId + ":" + ROUTE_COUNT_KEY;
     }
 }

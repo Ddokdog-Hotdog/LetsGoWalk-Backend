@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.ddokdoghotdog.gowalk.entity.Walk;
 import com.ddokdoghotdog.gowalk.global.entity.BaseMemberIdDTO;
 import com.ddokdoghotdog.gowalk.pet.dto.PetDTO;
+import com.ddokdoghotdog.gowalk.walks.model.WalkPaths.PathPoint;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,6 +48,15 @@ public class WalkDTO {
                     .dogs(dogResponse)
                     .build();
         }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class WalkUpdateRequest extends BaseMemberIdDTO {
+        private Long walkId;
+        private List<PathPoint> walkPaths;
     }
 
     @Getter

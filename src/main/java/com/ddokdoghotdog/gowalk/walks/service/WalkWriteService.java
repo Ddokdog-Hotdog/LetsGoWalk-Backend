@@ -1,6 +1,7 @@
 package com.ddokdoghotdog.gowalk.walks.service;
 
 import java.sql.Timestamp;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -19,16 +20,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Transactional
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class WalkWriteService {
     private final WalkRedisService walkRedisService;
+    private final WalkReadService walkReadService;
     private final PetRepository petRepository;
     private final WalkRepository walkRepository;
     private final WalkPathsRepository walkPathRepository;
 
-    @Transactional
     public WalkDTO.WalkStartResponse startWalk(WalkDTO.WalkStartRequest walkStartDTO) throws JsonProcessingException {
 
         List<Pet> pets = petRepository.findAllByIdInAndMemberId(walkStartDTO.getDogs(), walkStartDTO.getMemberId());
@@ -46,7 +48,40 @@ public class WalkWriteService {
         return WalkDTO.WalkStartResponse.of(walk);
     }
 
-    public WalkPaths saveWalk(WalkPaths walk) {
-        return walkPathRepository.save(walk);
+    // 기록, 결과에 현재정보 칼로리 m등 정보주면 좋을듯
+    public void recordWalkPath(WalkDTO.WalkUpdateRequest walkUpdateDTO) throws JsonProcessingException {
+        Long memberId = walkUpdateDTO.getMemberId();
+        Long walkId = walkUpdateDTO.getWalkId();
+
+        Walk walk = walkReadService.getWalkByIdAndMemberId(walkId, memberId);
+        walkRedisService.updateWalkPath(walkId, walkUpdateDTO.getWalkPaths());
+    }
+
+    public WalkDTO.WalkEndResponse endWalk(WalkDTO.WalkEndRequest walkEndDTO) throws JsonProcessingException {
+        Long memberId = walkEndDTO.getMemberId();
+        Long walkId = walkEndDTO.getWalkId();
+        Walk walk = walkReadService.getWalkByIdAndMemberId(walkId, memberId);
+        PathPoint finalLocation = WalkPaths.PathPoint.from(walkEndDTO.getLatitude(), walkEndDTO.getLongitude());
+
+        List<PathPoint> allPoints = walkRedisService.getAllPathPoints(walkId);
+        allPoints.add(finalLocation);
+        allPoints.sort(Comparator.comparing(PathPoint::getRecordTime));
+
+        // MongoDB저장
+        WalkPaths walkPaths = WalkPaths.builder()
+                .walkId(walkId)
+                .paths(allPoints)
+                .build();
+        walkPathRepository.save(walkPaths);
+
+        // Oracle 업데이트
+        walk.toBuilder()
+                .endTime(new Timestamp(System.currentTimeMillis()))
+                // totalDistance totalCalories
+                .build();
+
+        walkRepository.save(walk);
+        walkRedisService.cleanupRedisData(walkId);
+        return null;
     }
 }
