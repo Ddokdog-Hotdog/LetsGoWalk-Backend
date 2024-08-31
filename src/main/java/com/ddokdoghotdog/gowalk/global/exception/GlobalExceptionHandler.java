@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(JsonProcessingException.class)
-    public ResponseEntity<String> handleJsonProcessingException(JsonProcessingException e) {
+    public ResponseEntity<ErrorResponse> handleJsonProcessingException(JsonProcessingException e) {
         final ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
         log.error("JsonProcessingException", e);
         final ErrorResponse response = new ErrorResponse(errorCode);

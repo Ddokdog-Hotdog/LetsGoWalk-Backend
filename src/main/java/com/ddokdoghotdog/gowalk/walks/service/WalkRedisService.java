@@ -23,11 +23,13 @@ public class WalkRedisService {
     private final String WALK_KEY = "walk";
     private final String ROUTE_KEY = "route";
     private final String ROUTE_COUNT_KEY = "routeCount";
+    private final String DISTANCE_KEY = "distance";
 
     public void initPath(Long walkId, PathPoint initialLocation) throws JsonProcessingException {
         String key = walkBaseKey(walkId) + "1";
         String locationJson = objectMapper.writeValueAsString(List.of(initialLocation));
-        redisTemplate.opsForValue().set(key, locationJson, TTL, TimeUnit.HOURS);
+        // redisTemplate.opsForValue().set(key, locationJson, TTL, TimeUnit.HOURS);
+        redisTemplate.opsForHash().put(key, "1", initialLocation);
     }
 
     public void updateWalkPath(Long walkId, List<PathPoint> newPoints) throws JsonProcessingException {
@@ -86,5 +88,9 @@ public class WalkRedisService {
 
     private String walkCountKey(Long walkId) {
         return WALK_KEY + ":" + walkId + ":" + ROUTE_COUNT_KEY;
+    }
+
+    private String walkDistanceKey(Long walkId) {
+        return WALK_KEY + ":" + walkId + ":" + DISTANCE_KEY;
     }
 }
