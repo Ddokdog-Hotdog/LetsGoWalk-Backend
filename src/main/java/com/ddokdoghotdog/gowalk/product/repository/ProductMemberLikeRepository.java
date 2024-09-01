@@ -1,11 +1,15 @@
 package com.ddokdoghotdog.gowalk.product.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.ddokdoghotdog.gowalk.entity.Member;
+import com.ddokdoghotdog.gowalk.entity.Product;
 import com.ddokdoghotdog.gowalk.entity.ProductMemberLike;
 import com.ddokdoghotdog.gowalk.entity.ProductMemberLike.ProductMemberLikeId;
 
@@ -22,5 +26,9 @@ public interface ProductMemberLikeRepository extends JpaRepository<ProductMember
 			+ "WHERE productid = :productId\r\n"
 			+ "  AND memberid = :memberId" , nativeQuery = true)
 	void deleteLike(@Param("productId") Long productId, @Param("memberId") Long memberId);
+	
+	
+	// Product와 Member를 기반으로 ProductMemberLike를 조회하는 메서드
+    Optional<ProductMemberLike> findByProductAndMember(Product product, Member member);
 	
 }
