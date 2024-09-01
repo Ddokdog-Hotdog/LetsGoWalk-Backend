@@ -29,17 +29,16 @@ public class WalkController {
         return new ResponseEntity<>(walkWriteService.startWalk(walkStartDTO), HttpStatus.CREATED);
     }
 
-    // walkupdateResponse 만들기
     @PostMapping("/update")
-    public ResponseEntity<String> updateWalk(@RequestBody WalkDTO.WalkUpdateRequest walkUpdateDTO)
+    public ResponseEntity<WalkDTO.WalkUpdateResponse> updateWalk(@RequestBody WalkDTO.WalkUpdateRequest walkUpdateDTO)
             throws JsonProcessingException {
-        walkWriteService.recordWalkPath(walkUpdateDTO);
-        return new ResponseEntity<>("하이", HttpStatus.OK);
+        return new ResponseEntity<>(walkWriteService.recordWalkPath(walkUpdateDTO), HttpStatus.OK);
     }
 
     @PostMapping("/end")
-    public ResponseEntity<WalkDTO.WalkEndResponse> endWalk(@RequestBody WalkDTO.WalkEndRequest walkEndDTO) {
-        return null;
+    public ResponseEntity<WalkDTO.WalkEndResponse> endWalk(@RequestBody WalkDTO.WalkEndRequest walkEndDTO)
+            throws JsonProcessingException {
+        return new ResponseEntity<>(walkWriteService.endWalk(walkEndDTO), HttpStatus.OK);
     }
 
     @PostMapping("/daily")

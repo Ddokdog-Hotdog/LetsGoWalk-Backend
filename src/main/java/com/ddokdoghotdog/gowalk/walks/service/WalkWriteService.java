@@ -13,8 +13,10 @@ import com.ddokdoghotdog.gowalk.pet.repository.PetRepository;
 import com.ddokdoghotdog.gowalk.walks.dto.WalkDTO;
 import com.ddokdoghotdog.gowalk.walks.model.WalkPaths;
 import com.ddokdoghotdog.gowalk.walks.model.WalkPaths.PathPoint;
+import com.ddokdoghotdog.gowalk.walks.repository.PetWalkRepository;
 import com.ddokdoghotdog.gowalk.walks.repository.WalkPathsRepository;
 import com.ddokdoghotdog.gowalk.walks.repository.WalkRepository;
+import com.ddokdoghotdog.gowalk.walks.util.CalorieCalculator;
 import com.ddokdoghotdog.gowalk.walks.util.DistanceCalculator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -26,73 +28,97 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Service
 public class WalkWriteService {
-    private final WalkRedisService walkRedisService;
-    private final WalkReadService walkReadService;
-    private final PetRepository petRepository;
-    private final WalkRepository walkRepository;
-    private final WalkPathsRepository walkPathRepository;
+        private final WalkRedisService walkRedisService;
+        private final WalkReadService walkReadService;
+        private final PetRepository petRepository;
+        private final WalkRepository walkRepository;
+        private final WalkPathsRepository walkPathRepository;
+        private final PetWalkRepository petWalkRepository;
 
-    public WalkDTO.WalkStartResponse startWalk(WalkDTO.WalkStartRequest walkStartDTO) throws JsonProcessingException {
+        public WalkDTO.WalkStartResponse startWalk(WalkDTO.WalkStartRequest walkStartDTO)
+                        throws JsonProcessingException {
 
-        List<Pet> pets = petRepository.findAllByIdInAndMemberId(walkStartDTO.getDogs(), walkStartDTO.getMemberId());
-        Timestamp startTime = new Timestamp(System.currentTimeMillis());
-        Walk walk = Walk.builder()
-                .startTime(startTime)
-                .totalDistance(0L)
-                .build();
-        pets.forEach(walk::addPet);
-        walkRepository.save(walk);
+                List<Pet> pets = petRepository.findAllByIdInAndMemberId(walkStartDTO.getDogs(),
+                                walkStartDTO.getMemberId());
+                Timestamp startTime = new Timestamp(System.currentTimeMillis());
+                Walk walk = Walk.builder()
+                                .startTime(startTime)
+                                .totalDistance(0L)
+                                .build();
+                pets.forEach(walk::addPet);
+                walkRepository.save(walk);
 
-        PathPoint initialLocation = WalkPaths.PathPoint.from(
-                walkStartDTO.getLatitude(),
-                walkStartDTO.getLongitude());
-        walkRedisService.initPath(walk.getId(), initialLocation);
-        return WalkDTO.WalkStartResponse.of(walk);
-    }
+                PathPoint initialLocation = WalkPaths.PathPoint.from(
+                                walkStartDTO.getLatitude(),
+                                walkStartDTO.getLongitude());
+                walkRedisService.initPath(walk.getId(), initialLocation);
+                return WalkDTO.WalkStartResponse.of(walk);
+        }
 
-    // 기록, 결과에 현재정보 칼로리 m등 정보주면 좋을듯
-    public void recordWalkPath(WalkDTO.WalkUpdateRequest walkUpdateDTO) throws JsonProcessingException {
-        Long memberId = walkUpdateDTO.getMemberId();
-        Long walkId = walkUpdateDTO.getWalkId();
-        Walk walk = walkReadService.getWalkByIdAndMemberId(walkId, memberId);
+        public WalkDTO.WalkUpdateResponse recordWalkPath(WalkDTO.WalkUpdateRequest walkUpdateDTO)
+                        throws JsonProcessingException {
+                Long memberId = walkUpdateDTO.getMemberId();
+                Long walkId = walkUpdateDTO.getWalkId();
+                Walk walk = walkReadService.getWalkByIdAndMemberId(walkId, memberId);
 
-        // 거리 계산
-        double prevDistance = walk.getTotalDistance();
-        double newDistance = DistanceCalculator.calculateDistance(walkUpdateDTO.getWalkPaths());
-        double totalDistance = prevDistance + newDistance;
+                walk = updateDistance(walk, walkUpdateDTO.getWalkPaths());
+                walk = updateCalories(walk, walkUpdateDTO.getWalkPaths());
+                walkRedisService.updateWalkPath(walkId, walkUpdateDTO.getWalkPaths());
 
-        // 칼로리 계산
+                return WalkDTO.WalkUpdateResponse.of(walk);
+        }
 
-        // 각 강아지들마다 칼로리 계산 후 oracle DB업데이트(petwalk.total_calories)
-        // 거리 계산 후 db업데이트
-        walkRedisService.updateWalkPath(walkId, walkUpdateDTO.getWalkPaths());
-    }
+        public WalkDTO.WalkEndResponse endWalk(WalkDTO.WalkEndRequest walkEndDTO) throws JsonProcessingException {
+                Long memberId = walkEndDTO.getMemberId();
+                Long walkId = walkEndDTO.getWalkId();
+                Walk walk = walkReadService.getWalkByIdAndMemberId(walkId, memberId);
+                PathPoint finalLocation = WalkPaths.PathPoint.from(walkEndDTO.getLatitude(), walkEndDTO.getLongitude());
 
-    public WalkDTO.WalkEndResponse endWalk(WalkDTO.WalkEndRequest walkEndDTO) throws JsonProcessingException {
-        Long memberId = walkEndDTO.getMemberId();
-        Long walkId = walkEndDTO.getWalkId();
-        Walk walk = walkReadService.getWalkByIdAndMemberId(walkId, memberId);
-        PathPoint finalLocation = WalkPaths.PathPoint.from(walkEndDTO.getLatitude(), walkEndDTO.getLongitude());
+                // 경로 정렬
+                List<PathPoint> allPoints = walkRedisService.getAllPathPoints(walkId);
+                allPoints.add(finalLocation);
+                allPoints.sort(Comparator.comparing(PathPoint::getRecordTime));
 
-        List<PathPoint> allPoints = walkRedisService.getAllPathPoints(walkId);
-        allPoints.add(finalLocation);
-        allPoints.sort(Comparator.comparing(PathPoint::getRecordTime));
+                // MongoDB저장
+                WalkPaths walkPaths = WalkPaths.builder()
+                                .walkId(walkId)
+                                .paths(allPoints)
+                                .build();
+                walkPathRepository.save(walkPaths);
 
-        // MongoDB저장
-        WalkPaths walkPaths = WalkPaths.builder()
-                .walkId(walkId)
-                .paths(allPoints)
-                .build();
-        walkPathRepository.save(walkPaths);
+                // Oracle 업데이트
+                walk = walk.toBuilder()
+                                .endTime(new Timestamp(System.currentTimeMillis()))
+                                .build();
+                walkRepository.save(walk);
 
-        // Oracle 업데이트
-        walk.toBuilder()
-                .endTime(new Timestamp(System.currentTimeMillis()))
-                // totalDistance totalCalories
-                .build();
+                walkRedisService.cleanupRedisData(walkId);
+                return WalkDTO.WalkEndResponse.of(walk);
+        }
 
-        walkRepository.save(walk);
-        walkRedisService.cleanupRedisData(walkId);
-        return null;
-    }
+        private Walk updateDistance(Walk walk, List<WalkPaths.PathPoint> newPathPoints) {
+                Long prevDistance = walk.getTotalDistance();
+                Long newDistance = DistanceCalculator.calculateDistance(newPathPoints);
+                Long totalDistance = prevDistance + newDistance;
+                Walk updatewalk = walk.toBuilder()
+                                .totalDistance((long) totalDistance)
+                                .build();
+                walkRepository.save(updatewalk);
+                return updatewalk;
+        }
+
+        private Walk updateCalories(Walk walk, List<WalkPaths.PathPoint> newPathPoints) {
+                walk.getPetWalks().forEach(petWalk -> {
+                        Pet pet = petWalk.getPet();
+                        double petWeight = pet.getWeight();
+                        double prevCalories = petWalk.getTotalCalories();
+                        double curCalories = CalorieCalculator.calculateCalories(petWeight, newPathPoints);
+                        double totalCalories = prevCalories + curCalories;
+                        petWalk = petWalk.toBuilder()
+                                        .totalCalories(totalCalories)
+                                        .build();
+                        petWalkRepository.save(petWalk);
+                });
+                return walk;
+        }
 }

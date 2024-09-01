@@ -26,10 +26,8 @@ public class WalkReadService {
     }
 
     public Walk getWalkByIdAndMemberId(Long walkId, Long memberId) {
-        Walk walk = walkRepository.findByIdAndMemberId(walkId, memberId)
+        return walkRepository.findByIdAndMemberId(walkId, memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.WALK_NOT_FOUND));
-
-        return null;
     }
 
     public List<Walk> getMonthlyWalk(Long memberId, int year, int month) {

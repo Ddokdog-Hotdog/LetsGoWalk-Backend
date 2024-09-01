@@ -50,6 +50,7 @@ public class Walk {
         PetWalk petWalk = PetWalk.builder()
                 .pet(pet)
                 .walk(this)
+                .totalCalories(0.0)
                 .build();
         petWalks.add(petWalk);
     }
