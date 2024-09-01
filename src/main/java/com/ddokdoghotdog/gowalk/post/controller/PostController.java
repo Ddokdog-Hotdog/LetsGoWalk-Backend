@@ -22,8 +22,8 @@ import com.ddokdoghotdog.gowalk.post.dto.response.PostGetDetailResponseDTO;
 import com.ddokdoghotdog.gowalk.post.dto.response.PostGetListResponseDTO;
 import com.ddokdoghotdog.gowalk.post.service.PostService;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+//import io.swagger.v3.oas.annotations.Operation;
+//import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.AllArgsConstructor;
 
 @RestController
