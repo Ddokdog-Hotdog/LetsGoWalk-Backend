@@ -2,7 +2,9 @@ package com.ddokdoghotdog.gowalk.entity;
 
 import java.sql.Timestamp;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -40,9 +42,6 @@ public class Walk {
     @Column(name = "total_distance")
     private Long totalDistance;
 
-    @Column(name = "total_calories")
-    private Double totalCalories;
-
     @OneToMany(mappedBy = "walk", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<PetWalk> petWalks = new HashSet<>();
@@ -53,6 +52,11 @@ public class Walk {
                 .walk(this)
                 .build();
         petWalks.add(petWalk);
+    }
 
+    public List<Pet> getPets() {
+        return this.getPetWalks().stream()
+                .map(petWalk -> petWalk.getPet())
+                .collect(Collectors.toList());
     }
 }

@@ -1,5 +1,7 @@
 package com.ddokdoghotdog.gowalk.walks.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +26,13 @@ public class WalkReadService {
     }
 
     public Walk getWalkByIdAndMemberId(Long walkId, Long memberId) {
-        return walkRepository.findByIdMemberId(walkId, memberId)
+        Walk walk = walkRepository.findByIdAndMemberId(walkId, memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.WALK_NOT_FOUND));
+
+        return null;
+    }
+
+    public List<Walk> getMonthlyWalk(Long memberId, int year, int month) {
+        return walkRepository.findAllByPetOwnerMemberIdAndMonth(memberId, year, month);
     }
 }

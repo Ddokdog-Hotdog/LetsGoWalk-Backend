@@ -35,4 +35,6 @@ public class PetWalk {
     @JoinColumn(name = "walkid", nullable = false)
     private Walk walk;
 
+    @Column(name = "total_calories")
+    private Double totalCalories;
 }

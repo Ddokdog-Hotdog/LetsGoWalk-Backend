@@ -1,6 +1,8 @@
 package com.ddokdoghotdog.gowalk.pet.dto;
 
 import java.sql.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.ddokdoghotdog.gowalk.entity.Breed;
 import com.ddokdoghotdog.gowalk.entity.Member;
@@ -81,6 +83,12 @@ public class PetDTO {
                     .neutering(pet.getNeutering())
                     .profileImageUrl(pet.getProfileImageUrl())
                     .build();
+        }
+
+        public static List<Response> from(List<Pet> pets) {
+            return pets.stream()
+                    .map(Response::of)
+                    .collect(Collectors.toList());
         }
     }
 }

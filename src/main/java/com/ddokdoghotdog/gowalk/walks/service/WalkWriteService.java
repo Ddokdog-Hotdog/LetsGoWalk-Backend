@@ -15,6 +15,7 @@ import com.ddokdoghotdog.gowalk.walks.model.WalkPaths;
 import com.ddokdoghotdog.gowalk.walks.model.WalkPaths.PathPoint;
 import com.ddokdoghotdog.gowalk.walks.repository.WalkPathsRepository;
 import com.ddokdoghotdog.gowalk.walks.repository.WalkRepository;
+import com.ddokdoghotdog.gowalk.walks.util.DistanceCalculator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class WalkWriteService {
         Timestamp startTime = new Timestamp(System.currentTimeMillis());
         Walk walk = Walk.builder()
                 .startTime(startTime)
+                .totalDistance(0L)
                 .build();
         pets.forEach(walk::addPet);
         walkRepository.save(walk);
@@ -52,8 +54,17 @@ public class WalkWriteService {
     public void recordWalkPath(WalkDTO.WalkUpdateRequest walkUpdateDTO) throws JsonProcessingException {
         Long memberId = walkUpdateDTO.getMemberId();
         Long walkId = walkUpdateDTO.getWalkId();
-
         Walk walk = walkReadService.getWalkByIdAndMemberId(walkId, memberId);
+
+        // 거리 계산
+        double prevDistance = walk.getTotalDistance();
+        double newDistance = DistanceCalculator.calculateDistance(walkUpdateDTO.getWalkPaths());
+        double totalDistance = prevDistance + newDistance;
+
+        // 칼로리 계산
+
+        // 각 강아지들마다 칼로리 계산 후 oracle DB업데이트(petwalk.total_calories)
+        // 거리 계산 후 db업데이트
         walkRedisService.updateWalkPath(walkId, walkUpdateDTO.getWalkPaths());
     }
 

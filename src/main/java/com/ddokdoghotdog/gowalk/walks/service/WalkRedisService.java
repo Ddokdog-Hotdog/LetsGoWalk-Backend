@@ -28,36 +28,34 @@ public class WalkRedisService {
     public void initPath(Long walkId, PathPoint initialLocation) throws JsonProcessingException {
         String key = walkBaseKey(walkId) + "1";
         String locationJson = objectMapper.writeValueAsString(List.of(initialLocation));
-        // redisTemplate.opsForValue().set(key, locationJson, TTL, TimeUnit.HOURS);
-        redisTemplate.opsForHash().put(key, "1", initialLocation);
+        redisTemplate.opsForHash().put(key, "1", locationJson);
+        redisTemplate.opsForHash().put(key, ROUTE_COUNT_KEY, "1");
+        redisTemplate.expire(key, TTL, TimeUnit.HOURS);
     }
 
     public void updateWalkPath(Long walkId, List<PathPoint> newPoints) throws JsonProcessingException {
         String baseKey = walkBaseKey(walkId);
-        String countKey = walkCountKey(walkId);
 
         // 현재 route 번호 가져오기
-        String countStr = redisTemplate.opsForValue().get(countKey);
+        String countStr = (String) redisTemplate.opsForHash().get(baseKey, ROUTE_COUNT_KEY);
         int count = (countStr == null) ? 1 : Integer.parseInt(countStr);
 
         // 새로운 경로 포인트 저장
-        String key = baseKey + count;
         String pointsJson = objectMapper.writeValueAsString(newPoints);
-        redisTemplate.opsForValue().set(key, pointsJson, TTL, TimeUnit.HOURS);
-        redisTemplate.opsForValue().set(countKey, String.valueOf(count + 1), TTL, TimeUnit.HOURS);
+        redisTemplate.opsForHash().put(baseKey, String.valueOf(count), pointsJson);
+        redisTemplate.opsForHash().put(baseKey, ROUTE_COUNT_KEY, String.valueOf(count + 1));
+        redisTemplate.expire(baseKey, TTL, TimeUnit.HOURS);
     }
 
     public List<PathPoint> getAllPathPoints(Long walkId) throws JsonProcessingException {
         List<PathPoint> allPoints = new ArrayList<>();
-        String baseKey = walkBaseKey(walkId);
-        String countKey = walkCountKey(walkId);
+        String key = walkBaseKey(walkId);
 
-        String countStr = redisTemplate.opsForValue().get(countKey);
+        String countStr = (String) redisTemplate.opsForHash().get(key, ROUTE_COUNT_KEY);
         int count = (countStr == null) ? 0 : Integer.parseInt(countStr);
 
         for (int i = 1; i <= count; i++) {
-            String key = baseKey + i;
-            String pointsJson = redisTemplate.opsForValue().get(key);
+            String pointsJson = (String) redisTemplate.opsForHash().get(key, String.valueOf(i));
             if (pointsJson != null) {
                 List<PathPoint> points = objectMapper.readValue(pointsJson,
                         objectMapper.getTypeFactory().constructCollectionType(List.class, PathPoint.class));
@@ -69,28 +67,22 @@ public class WalkRedisService {
     }
 
     public void cleanupRedisData(Long walkId) {
-        String baseKey = walkBaseKey(walkId);
-        String countKey = walkCountKey(walkId);
-
-        String countStr = redisTemplate.opsForValue().get(countKey);
-        int count = (countStr == null) ? 0 : Integer.parseInt(countStr);
-
-        for (int i = 1; i <= count; i++) {
-            String key = baseKey + i;
-            redisTemplate.delete(key);
-        }
-        redisTemplate.delete(countKey);
+        String key = walkBaseKey(walkId);
+        redisTemplate.delete(key);
     }
 
     private String walkBaseKey(Long walkId) {
         return WALK_KEY + ":" + walkId + ":" + ROUTE_KEY;
     }
 
-    private String walkCountKey(Long walkId) {
-        return WALK_KEY + ":" + walkId + ":" + ROUTE_COUNT_KEY;
+    public void updateDistance(Long walkId, double distance) {
+        String key = walkBaseKey(walkId);
+        redisTemplate.opsForHash().put(key, DISTANCE_KEY, String.valueOf(distance));
     }
 
-    private String walkDistanceKey(Long walkId) {
-        return WALK_KEY + ":" + walkId + ":" + DISTANCE_KEY;
+    public Double getDistance(Long walkId) {
+        String key = walkBaseKey(walkId);
+        String distanceStr = (String) redisTemplate.opsForHash().get(key, DISTANCE_KEY);
+        return distanceStr != null ? Double.valueOf(distanceStr) : null;
     }
 }
