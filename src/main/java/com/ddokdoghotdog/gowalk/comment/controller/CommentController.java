@@ -20,6 +20,10 @@ import com.ddokdoghotdog.gowalk.entity.Member;
 import com.ddokdoghotdog.gowalk.global.exception.BusinessException;
 import com.ddokdoghotdog.gowalk.global.exception.ErrorCode;
 
+
+//import io.swagger.v3.oas.annotations.Operation;
+//import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import lombok.AllArgsConstructor;
 
 @Controller
