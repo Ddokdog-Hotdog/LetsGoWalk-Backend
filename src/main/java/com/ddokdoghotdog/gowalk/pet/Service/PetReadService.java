@@ -1,7 +1,6 @@
 package com.ddokdoghotdog.gowalk.pet.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,9 +35,7 @@ public class PetReadService {
     public List<PetDTO.Response> getPetsByMemberId(Long memberId) {
         List<Pet> pets = petRepository.findByMemberId(memberId);
 
-        return pets.stream()
-                .map(PetDTO.Response::of)
-                .collect(Collectors.toList());
+        return PetDTO.Response.from(pets);
     }
 
     public List<Breed> getBreedList() {

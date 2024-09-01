@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -35,4 +35,6 @@ public class PetWalk {
     @JoinColumn(name = "walkid", nullable = false)
     private Walk walk;
 
+    @Column(name = "total_calories")
+    private Double totalCalories;
 }

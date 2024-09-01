@@ -22,39 +22,41 @@ import com.ddokdoghotdog.gowalk.post.dto.response.PostGetDetailResponseDTO;
 import com.ddokdoghotdog.gowalk.post.dto.response.PostGetListResponseDTO;
 import com.ddokdoghotdog.gowalk.post.service.PostService;
 
+
 //import io.swagger.v3.oas.annotations.Operation;
 //import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/post")
 @AllArgsConstructor
 public class PostController {
-	
-	private final PostService postService;
 
-	@GetMapping("board/{boardid}")
+    private final PostService postService;
+
+    @GetMapping("board/{boardid}")
     public ResponseEntity<List<PostGetListResponseDTO>> getPostList(@PathVariable("boardid") Long boardid) {
         List<PostGetListResponseDTO> post = postService.getPostList(boardid);
         return ResponseEntity.ok(post);
     }
-	
-	@GetMapping("/{postid}")
-	public ResponseEntity<PostGetDetailResponseDTO> getPostDetail(@PathVariable("postid") Long postid){
-		PostGetDetailResponseDTO postGetDetailResponseDTO = postService.getPostDetails(postid);
-		return ResponseEntity.ok(postGetDetailResponseDTO);
-	}
-    
+
+    @GetMapping("/{postid}")
+    public ResponseEntity<PostGetDetailResponseDTO> getPostDetail(@PathVariable("postid") Long postid) {
+        PostGetDetailResponseDTO postGetDetailResponseDTO = postService.getPostDetails(postid);
+        return ResponseEntity.ok(postGetDetailResponseDTO);
+    }
+
     @PostMapping("/write")
-    public ResponseEntity<PostGetDetailResponseDTO> creaetPost(@RequestBody PostWriteRequestDTO dto){
-    	
-    	Post post = postService.createPost(dto);
-    	
-    	List<String> imageUrls = post.getMediaUrls().stream()
+    public ResponseEntity<PostGetDetailResponseDTO> creaetPost(@RequestBody PostWriteRequestDTO dto) {
+
+        Post post = postService.createPost(dto);
+
+        List<String> imageUrls = post.getMediaUrls().stream()
                 .map(MediaUrlList::getMediaUrl)
                 .collect(Collectors.toList());
-    	
-    	PostGetDetailResponseDTO responseDTO = PostGetDetailResponseDTO.builder()
+
+        PostGetDetailResponseDTO responseDTO = PostGetDetailResponseDTO.builder()
                 .title(post.getTitle())
                 .contents(post.getContents())
                 .nickname(post.getMember().getNickname())
@@ -64,23 +66,24 @@ public class PostController {
                 .imgList(imageUrls)
                 .comments(null)
                 .build();
-    	
-    	return ResponseEntity.ok(responseDTO);
+
+        return ResponseEntity.ok(responseDTO);
     }
-    
+
     @PutMapping("/{postid}")
-    public ResponseEntity<?> editPost(@PathVariable("postid") Long postid, @RequestBody PostDetailUpdateRequestDTO requestDTO) {
-        
-    	postService.editPost(postid, requestDTO);
-        
+    public ResponseEntity<?> editPost(@PathVariable("postid") Long postid,
+            @RequestBody PostDetailUpdateRequestDTO requestDTO) {
+
+        postService.editPost(postid, requestDTO);
+
         return ResponseEntity.ok().build();
     }
 
-    
     @DeleteMapping("/{postid}")
-    public ResponseEntity<Void> deletePost(@PathVariable("postid") Long postid, @RequestBody PostDetailDeleteRequestDTO dto) {
+    public ResponseEntity<Void> deletePost(@PathVariable("postid") Long postid,
+            @RequestBody PostDetailDeleteRequestDTO dto) {
         postService.deletePost(postid, dto);
         return ResponseEntity.ok().build();
     }
-    
+
 }

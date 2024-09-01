@@ -40,6 +40,9 @@ public enum ErrorCode {
     POST_NOT_FOUND("존재하지 않는 게시글입니다.", 404),
     BOARD_NOT_FOUND("존재하지 않는 게시판입니다.", 404),
     COMMENT_NOT_FOUND("존재하지 않는 댓글입니다.", 404),
+
+    WALK_NOT_FOUND("존재하지 않는 산책정보입니다.", 404),
+
     PRODUCT_NOT_FOUND("존재하지 않는 상품입니다.", 404),
     PRODUCT_LIKE_NOT_FOUND("찜을 누르지 않은 상품입니다.", 404),
     CARTITEM_NOT_FOUND("장바구니에 없는 상품입니다.", 404),
@@ -49,6 +52,7 @@ public enum ErrorCode {
     PAYMENT_NOT_FOUND("존재하지 않는 결제 내용입니다.", 404),
     
 
+
     // 406 Not Acceptable
     INVALID_PHONE_NUMBER("유효하지 않은 휴대폰번호입니다.", 406),
     LACK_STOCK("상품 재고가 부족합니다.", 406),
@@ -57,9 +61,13 @@ public enum ErrorCode {
     // 500 INTERNAL SERVER ERROR
     DB_QUERY_EXECUTION_ERROR("쿼리가 정상적으로 완료되지 않았습니다.", 500),
     AWS_S3_UPLOAD_ERROR("AWS S3 이미지 업로드에 실패하였습니다.", 500),
+
+    PATHPOINT_EXECUTION_ERROR("경로 저장중 오류가 발생했습니다.", 500),
+
     CART_ITEM_INSERT_ERROR("장바구니 담기에 실패하였습니다.", 500),
     PAYMENT_ERROR("결제에 실패하였습니다.", 500),
     REFUND_ERROR("환불에 실패하였습니다.", 500),
+
 
     /* Spring Basic Exceptions */
     INTERNAL_SERVER_ERROR("서버 오류가 발생했습니다.", 500);

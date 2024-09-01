@@ -2,7 +2,9 @@ package com.ddokdoghotdog.gowalk.entity;
 
 import java.sql.Timestamp;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -19,7 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -40,9 +42,6 @@ public class Walk {
     @Column(name = "total_distance")
     private Long totalDistance;
 
-    @Column(name = "total_calories")
-    private Double totalCalories;
-
     @OneToMany(mappedBy = "walk", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<PetWalk> petWalks = new HashSet<>();
@@ -51,8 +50,14 @@ public class Walk {
         PetWalk petWalk = PetWalk.builder()
                 .pet(pet)
                 .walk(this)
+                .totalCalories(0.0)
                 .build();
         petWalks.add(petWalk);
+    }
 
+    public List<Pet> getPets() {
+        return this.getPetWalks().stream()
+                .map(petWalk -> petWalk.getPet())
+                .collect(Collectors.toList());
     }
 }
