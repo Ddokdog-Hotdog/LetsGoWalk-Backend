@@ -25,7 +25,7 @@ public class PostGetDetailResponseDTO {
     private Long memberid;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private int likesCount;
+    private Long likesCount;
     private int commentsCount;
     private List<String> imgList;
     private List<CommentDTO> comments;

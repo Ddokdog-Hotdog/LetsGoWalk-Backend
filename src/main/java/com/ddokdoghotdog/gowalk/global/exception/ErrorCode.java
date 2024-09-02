@@ -37,6 +37,7 @@ public enum ErrorCode {
     POST_NOT_FOUND("존재하지 않는 게시글입니다.", 404),
     BOARD_NOT_FOUND("존재하지 않는 게시판입니다.", 404),
     COMMENT_NOT_FOUND("존재하지 않는 댓글입니다.", 404),
+    POST_OR_MEMBER_NOT_FOUND("게시글 혹은 유저가 존재하지 않습니다.", 404),
 
     // 406 Not Acceptable
     INVALID_PHONE_NUMBER("유효하지 않은 휴대폰번호입니다.", 406),

@@ -1,12 +1,11 @@
 package com.ddokdoghotdog.gowalk.comment.controller;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.security.Principal;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,39 +19,30 @@ import com.ddokdoghotdog.gowalk.comment.dto.request.CommentWriteRequestDTO;
 import com.ddokdoghotdog.gowalk.comment.dto.response.CommentWriteResponseDTO;
 import com.ddokdoghotdog.gowalk.comment.service.CommentService;
 import com.ddokdoghotdog.gowalk.entity.Comment;
-import com.ddokdoghotdog.gowalk.entity.MediaUrlList;
-import com.ddokdoghotdog.gowalk.entity.Member;
-import com.ddokdoghotdog.gowalk.entity.Post;
-import com.ddokdoghotdog.gowalk.global.exception.BusinessException;
-import com.ddokdoghotdog.gowalk.global.exception.ErrorCode;
-import com.ddokdoghotdog.gowalk.post.dto.request.PostWriteRequestDTO;
-import com.ddokdoghotdog.gowalk.post.dto.response.PostGetDetailResponseDTO;
-import com.ddokdoghotdog.gowalk.post.dto.response.PostGetListResponseDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.AllArgsConstructor;
 
 @Controller
 @AllArgsConstructor
-@RequestMapping("/comment")
+@RequestMapping("/api/comment")
 public class CommentController {
 	
 	private final CommentService commentService;
 	private final MemberRepository memberRepository;
 
 	@PostMapping("/write")
-    public ResponseEntity<CommentWriteResponseDTO> creaetComment(@RequestBody CommentWriteRequestDTO dto){
+	@Operation(summary = "댓글 작성", description = "댓글을 작성합니다.")
+    public ResponseEntity<CommentWriteResponseDTO> creaetComment(@RequestBody CommentWriteRequestDTO dto, Principal principal){
     	
-    	Comment comment = commentService.createComment(dto);
-    	Member member = memberRepository.findById(dto.getMemberid())
-    			.orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+		Long memberId = Long.parseLong(principal.getName());
+    	Comment comment = commentService.createComment(dto, memberId);
     	
     	CommentWriteResponseDTO responseDTO = CommentWriteResponseDTO.builder()
     			.postid(dto.getPostid())
+                .memberid(memberId)
     			.commentid(dto.getCommentsid())
-    			.nickname(member.getNickname())
-    			.profileImageUrl(member.getProfileImageUrl())
+    			.profileImageUrl(comment.getMember().getProfileImageUrl())
     			.createdAt(dto.getCreatedAt())
     			.build();
     	
@@ -60,17 +50,21 @@ public class CommentController {
     }
 	
 	@PutMapping("/{commentid}")
-	public ResponseEntity<?> editComment(@PathVariable("commentid") Long commentid, @RequestBody CommentEditRequestDTO dto) {
+	@Operation(summary = "댓글 수정", description = "댓글을 수정합니다.")
+	public ResponseEntity<?> editComment(@PathVariable("commentid") Long commentid, @ModelAttribute CommentEditRequestDTO dto, Principal principal) {
 		
-		commentService.editComment(commentid, dto);
+		Long memberId = Long.parseLong(principal.getName());
+		commentService.editComment(commentid, dto, memberId);
 		
 		return ResponseEntity.ok().build();
 	}
 	
 	@DeleteMapping("/{commentid}")
-	public ResponseEntity<?> deleteComment(@PathVariable("commentid") Long commentid, @RequestBody CommentDeleteRequestDTO dto){
+	@Operation(summary = "댓글 삭제", description = "댓글을 삭제합니다.")
+	public ResponseEntity<?> deleteComment(@PathVariable("commentid") Long commentid, @ModelAttribute CommentDeleteRequestDTO dto, Principal principal){
 		
-		commentService.deleteComment(commentid, dto);
+		Long memberId = Long.parseLong(principal.getName());
+		commentService.deleteComment(commentid, dto, memberId);
 		
 		return ResponseEntity.ok().build();
 	}
