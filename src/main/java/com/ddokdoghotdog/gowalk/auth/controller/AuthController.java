@@ -1,17 +1,23 @@
 package com.ddokdoghotdog.gowalk.auth.controller;
 
+import java.sql.Date;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ddokdoghotdog.gowalk.auth.dto.PrincipalDetails;
 import com.ddokdoghotdog.gowalk.auth.repository.MemberRepository;
 import com.ddokdoghotdog.gowalk.entity.Member;
+import com.ddokdoghotdog.gowalk.global.jwt.TokenProvider;
 import com.ddokdoghotdog.gowalk.global.jwt.TokenService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,8 +28,9 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 
     private final TokenService tokenService;
-    // 테스트용 나중에 서비스만들어서 사용해주세요.
     private final MemberRepository memberRepository;
+    private final TokenProvider tokenProvider;
+  
 
     @GetMapping("/success")
     public ResponseEntity<String> loginSuccess(@RequestParam("accessToken") String accessToken) {
@@ -36,12 +43,44 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/info") // 테스트용 구현할때 지워주세용
-    public ResponseEntity<Member> myInfoTest() {
+    @GetMapping("/mypage")
+    public ResponseEntity<Member> mypage(@AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-        Member member = memberRepository.findById(1L).get();
+        Member member = principalDetails.getMember();
 
         return new ResponseEntity<>(member, HttpStatus.OK);
+    }
+    
+    @GetMapping("/owner/edit")
+    public ResponseEntity<Member> myInfo(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+
+        Member member = principalDetails.getMember();
+
+        return new ResponseEntity<>(member, HttpStatus.OK);
+    }
+    
+    @PostMapping("/owner/edit")
+    public ResponseEntity<Member> myInfoEdit(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+
+        Member member = principalDetails.getMember();
+        
+        return new ResponseEntity<>(member, HttpStatus.OK);
+    }
+    
+    @PostMapping("/register")
+    public ResponseEntity<String> completeRegistration(@RequestParam("accessToken") String accessToken,
+                                                  @RequestParam String gender,
+                                                  @RequestParam Date birthdate) {
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        
+        Member member = principal.getMember();
+        member.setGender(gender);
+        member.setDateOfBirth(birthdate);
+
+        memberRepository.save(member);
+
+        return ResponseEntity.ok("Registration completed successfully");
     }
 
 }

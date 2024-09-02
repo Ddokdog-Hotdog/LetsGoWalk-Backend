@@ -41,6 +41,7 @@ public enum ErrorCode {
     BOARD_NOT_FOUND("존재하지 않는 게시판입니다.", 404),
     COMMENT_NOT_FOUND("존재하지 않는 댓글입니다.", 404),
     POST_OR_MEMBER_NOT_FOUND("게시글 혹은 유저가 존재하지 않습니다.", 404),
+    QUEST_NOT_FOUND("존재하지 않는 퀘스트 ID입니다.", 404),
 
     WALK_NOT_FOUND("존재하지 않는 산책정보입니다.", 404),
 
