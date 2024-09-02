@@ -15,8 +15,11 @@ public class CalorieCalculator {
 
         // 칼로리 계산: MET * 몸무게 * 운동 시간 kcal
         double caloriesBurned = MET * weightInKg * totalDistance / 1000;
-
         return caloriesBurned;
     }
 
+    public static double calculateCalories(double weightInKg, Long distance) {
+        double caloriesBurned = MET * weightInKg * distance / 1000;
+        return caloriesBurned;
+    }
 }

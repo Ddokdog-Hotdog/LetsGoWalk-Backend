@@ -54,8 +54,6 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND("존재하지 않는 카테고리입니다.", 404),
     ORDER_ITEM_NOT_FOUND("존재하지 않는 주문 상품입니다.", 404),
     PAYMENT_NOT_FOUND("존재하지 않는 결제 내용입니다.", 404),
-    
-
 
     // 406 Not Acceptable
     INVALID_PHONE_NUMBER("유효하지 않은 휴대폰번호입니다.", 406),
@@ -65,7 +63,7 @@ public enum ErrorCode {
     // 500 INTERNAL SERVER ERROR
     DB_QUERY_EXECUTION_ERROR("쿼리가 정상적으로 완료되지 않았습니다.", 500),
     AWS_S3_UPLOAD_ERROR("AWS S3 이미지 업로드에 실패하였습니다.", 500),
-
+    MONGO_QUERY_EXECUTION_ERROR("쿼리가 정상적으로 완료되지 않았습니다.", 500),
     PATHPOINT_EXECUTION_ERROR("경로 저장중 오류가 발생했습니다.", 500),
 
     CART_ITEM_INSERT_ERROR("장바구니 담기에 실패하였습니다.", 500),

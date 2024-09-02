@@ -62,7 +62,7 @@ public class WalkWriteService {
                 Walk walk = walkReadService.getWalkByIdAndMemberId(walkId, memberId);
 
                 walk = updateDistance(walk, walkUpdateDTO.getWalkPaths());
-                walk = updateCalories(walk, walkUpdateDTO.getWalkPaths());
+                walk = updateCalories(walk, walk.getTotalDistance());
                 walkRedisService.updateWalkPath(walkId, walkUpdateDTO.getWalkPaths());
 
                 return WalkDTO.WalkUpdateResponse.of(walk);
@@ -107,13 +107,11 @@ public class WalkWriteService {
                 return updatewalk;
         }
 
-        private Walk updateCalories(Walk walk, List<WalkPaths.PathPoint> newPathPoints) {
+        private Walk updateCalories(Walk walk, Long totalDistance) {
                 walk.getPetWalks().forEach(petWalk -> {
                         Pet pet = petWalk.getPet();
                         double petWeight = pet.getWeight();
-                        double prevCalories = petWalk.getTotalCalories();
-                        double curCalories = CalorieCalculator.calculateCalories(petWeight, newPathPoints);
-                        double totalCalories = prevCalories + curCalories;
+                        double totalCalories = CalorieCalculator.calculateCalories(petWeight, totalDistance);
                         petWalk = petWalk.toBuilder()
                                         .totalCalories(totalCalories)
                                         .build();

@@ -17,7 +17,8 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
     @Override
     Optional<Pet> findById(Long id);
 
-    Optional<Pet> findByIdAndMemberId(@Param("id") Long id, @Param("memberid") Long memberId);
+    @Query("SELECT p FROM Pet p JOIN FETCH p.breed WHERE p.member.id = :memberId AND p.id = :id")
+    Optional<Pet> findByIdAndMemberId(@Param("id") Long id, @Param("memberId") Long memberId);
 
     List<Pet> findByMember(Member member);
 

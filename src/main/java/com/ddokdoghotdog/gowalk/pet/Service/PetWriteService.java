@@ -31,7 +31,7 @@ public class PetWriteService {
     public PetDTO.Response updatePet(PetDTO.Update petUpdateRequsetDTO) {
         Pet pet = petReadService.getPetByIdAndMemberId(petUpdateRequsetDTO.getPetId(),
                 petUpdateRequsetDTO.getMemberId());
-        Breed breed = Breed.builder().id(petUpdateRequsetDTO.getBreedId()).build();
+        Breed breed = petReadService.getBreedById(petUpdateRequsetDTO.getBreedId());
         pet.updatePet(petUpdateRequsetDTO, breed);
         petRepository.save(pet);
 
