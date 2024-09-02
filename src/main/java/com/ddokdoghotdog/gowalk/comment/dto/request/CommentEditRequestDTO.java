@@ -2,6 +2,8 @@ package com.ddokdoghotdog.gowalk.comment.dto.request;
 
 import java.time.LocalDateTime;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,8 +14,8 @@ import lombok.Setter;
 public class CommentEditRequestDTO {
 
 	private Long commentid;
-    private Long memberid;
     private String contents;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime updatedAt;
     
 }

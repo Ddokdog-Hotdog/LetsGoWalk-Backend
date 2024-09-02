@@ -2,6 +2,8 @@ package com.ddokdoghotdog.gowalk.post.dto.request;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.ddokdoghotdog.gowalk.entity.Board;
 import com.ddokdoghotdog.gowalk.entity.MediaUrlList;
 import com.ddokdoghotdog.gowalk.entity.Member;
@@ -23,6 +25,6 @@ public class PostWriteRequestDTO {
     private Long boardid;
     private String title;
     private String contents;
-    private List<String> mediaUrlList;
+    private List<MultipartFile> mediaUrlList;
 
 }

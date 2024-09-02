@@ -16,8 +16,8 @@ import lombok.Setter;
 public class CommentWriteResponseDTO {
 
 	private Long postid;
+	private Long memberid;
     private Long commentid;
-    private String nickname;
     private String profileImageUrl;
     private LocalDateTime createdAt;
     

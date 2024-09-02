@@ -1,5 +1,6 @@
 package com.ddokdoghotdog.gowalk.entity;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,19 +38,22 @@ public class Comment extends BaseTimeEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne
+	 @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberid", nullable = false)
     private Member member;
 
-    @ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY) // FetchType.LAZY 적용
     @JoinColumn(name = "postid", nullable = false)
     private Post post;
 
     @Column(name = "contents", nullable = false)
     private String contents;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "commentid", nullable = true)
     private Comment parentComment;
+    
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Comment> childComments = new ArrayList<>();
     
 }
