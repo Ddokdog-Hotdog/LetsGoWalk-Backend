@@ -27,12 +27,12 @@ public class QuestController {
         return questService.getVisibleQuestsAndAchievementsForToday(memberId);
     }
 
-    @PutMapping("")
+    @PostMapping("")
     public void completeQuest(@RequestParam(name = "memberId") Long memberId, @RequestParam(name = "questId") Long questId) {
         questService.completeQuest(memberId, questId);
     }
 
-    @PostMapping("")
+    @PutMapping("")
     public void rewardPoints(@RequestParam(name = "memberId") Long memberId, @RequestParam(name = "questId") Long questId) {
         questService.rewardPoints(memberId, questId);
     }

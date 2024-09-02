@@ -15,7 +15,6 @@ import com.ddokdoghotdog.gowalk.auth.repository.MemberRepository;
 import com.ddokdoghotdog.gowalk.entity.Member;
 import com.ddokdoghotdog.gowalk.entity.Quest;
 import com.ddokdoghotdog.gowalk.entity.QuestAchievement;
-import com.ddokdoghotdog.gowalk.entity.QuestAchievement.QuestAchievementId;
 import com.ddokdoghotdog.gowalk.quests.dto.QuestAchievementDTO;
 import com.ddokdoghotdog.gowalk.quests.dto.QuestDTO;
 import com.ddokdoghotdog.gowalk.quests.repository.QuestAchievementRepository;
@@ -39,12 +38,8 @@ public class QuestService {
         Quest quest = questRepository.findById(questId)
                 .orElseThrow(() -> new IllegalArgumentException("Quest not found"));
 
-        QuestAchievementId id = new QuestAchievementId();
-        id.setMemberid(memberId);
-        id.setQuestid(questId);
 
         QuestAchievement achievement = QuestAchievement.builder()
-                .id(id)
                 .member(member)
                 .quest(quest)
                 .isRewarded(false)
@@ -61,13 +56,9 @@ public class QuestService {
     public List<QuestDTO> getVisibleQuestsAndAchievementsForToday(Long memberId) {
     	 LocalDate today = LocalDate.now();
 
-     // 모든 퀘스트 가져오기 (isVisible이 true인 퀘스트들)
         List<Quest> visibleQuests = questRepository.findByIsVisibleTrue();
-
-        // 해당 멤버의 모든 퀘스트 달성 기록 가져오기
         List<QuestAchievement> achievements = questAchievementRepository.findByMemberId(memberId);
 
-        // visibleQuests를 순회하면서 QuestDTO 리스트로 변환
         return visibleQuests.stream()
             .map(quest -> {
                 Optional<QuestAchievement> optionalAchievement = achievements.stream()
@@ -120,12 +111,7 @@ public class QuestService {
 
     @Transactional
     public void rewardPoints(Long memberId, Long questId) {
-
-        QuestAchievement.QuestAchievementId achievementId = new QuestAchievement.QuestAchievementId();
-        achievementId.setMemberid(memberId);
-        achievementId.setQuestid(questId);
-
-        Optional<QuestAchievement> achievementOpt = questAchievementRepository.findById(achievementId);
+        Optional<QuestAchievement> achievementOpt = questAchievementRepository.findByMemberIdAndQuestId(memberId, questId);
 
         if (achievementOpt.isPresent()) {
             QuestAchievement achievement = achievementOpt.get();
