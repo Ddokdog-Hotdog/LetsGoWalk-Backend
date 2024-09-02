@@ -1,13 +1,15 @@
 package com.ddokdoghotdog.gowalk.walks.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ddokdoghotdog.gowalk.walks.model.WalkPaths;
+import com.ddokdoghotdog.gowalk.entity.Walk;
+import com.ddokdoghotdog.gowalk.global.exception.BusinessException;
+import com.ddokdoghotdog.gowalk.global.exception.ErrorCode;
 import com.ddokdoghotdog.gowalk.walks.repository.WalkPathsRepository;
+import com.ddokdoghotdog.gowalk.walks.repository.WalkRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,14 +17,20 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @Service
 public class WalkReadService {
-    private final WalkPathsRepository repository;
+    private final WalkPathsRepository walkPathRepository;
+    private final WalkRepository walkRepository;
 
-    public List<WalkPaths> getAllWalks() {
-        return repository.findAll();
+    public Walk getWalkById(Long walkId) {
+        return walkRepository.findWalkWithPetsById(walkId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.WALK_NOT_FOUND));
     }
 
-    public Optional<WalkPaths> getWalkById(String id) {
-        return repository.findById(id);
+    public Walk getWalkByIdAndMemberId(Long walkId, Long memberId) {
+        return walkRepository.findByIdAndMemberId(walkId, memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.WALK_NOT_FOUND));
     }
 
+    public List<Walk> getMonthlyWalk(Long memberId, int year, int month) {
+        return walkRepository.findAllByPetOwnerMemberIdAndMonth(memberId, year, month);
+    }
 }

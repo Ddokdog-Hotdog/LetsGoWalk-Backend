@@ -21,13 +21,16 @@ import com.ddokdoghotdog.gowalk.comment.service.CommentService;
 import com.ddokdoghotdog.gowalk.entity.Comment;
 
 import io.swagger.v3.oas.annotations.Operation;
+import com.ddokdoghotdog.gowalk.entity.Member;
+import com.ddokdoghotdog.gowalk.global.exception.BusinessException;
+import com.ddokdoghotdog.gowalk.global.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 
 @Controller
 @AllArgsConstructor
 @RequestMapping("/api/comment")
 public class CommentController {
-	
+
 	private final CommentService commentService;
 	private final MemberRepository memberRepository;
 
@@ -55,17 +58,17 @@ public class CommentController {
 		
 		Long memberId = Long.parseLong(principal.getName());
 		commentService.editComment(commentid, dto, memberId);
-		
+
 		return ResponseEntity.ok().build();
 	}
-	
+
 	@DeleteMapping("/{commentid}")
 	@Operation(summary = "댓글 삭제", description = "댓글을 삭제합니다.")
 	public ResponseEntity<?> deleteComment(@PathVariable("commentid") Long commentid, @ModelAttribute CommentDeleteRequestDTO dto, Principal principal){
 		
 		Long memberId = Long.parseLong(principal.getName());
 		commentService.deleteComment(commentid, dto, memberId);
-		
+
 		return ResponseEntity.ok().build();
 	}
 }

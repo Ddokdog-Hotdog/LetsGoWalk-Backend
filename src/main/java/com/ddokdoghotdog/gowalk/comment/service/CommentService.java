@@ -14,17 +14,18 @@ import com.ddokdoghotdog.gowalk.global.exception.BusinessException;
 import com.ddokdoghotdog.gowalk.global.exception.ErrorCode;
 import com.ddokdoghotdog.gowalk.post.repository.PostRepository;
 
-import io.swagger.v3.oas.annotations.Operation;
+
+//import io.swagger.v3.oas.annotations.Operation;
+
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
 public class CommentService {
-	
+
 	private final MemberRepository memberRepository;
 	private final PostRepository postRepository;
 	private final CommentRepository commentRepository;
-
 	
 	// 댓글 작성
 	public Comment createComment(CommentWriteRequestDTO dto, Long memberId) {
@@ -33,20 +34,20 @@ public class CommentService {
 	            .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 		
 		Comment parentComment = null;
-		if(dto.getCommentsid() != null) {
+		if (dto.getCommentsid() != null) {
 			parentComment = commentRepository.findById(dto.getCommentsid())
-		            .orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND));
+					.orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND));
 		}
-		
+
 		Comment comment = Comment.builder()
 				.member(post.getMember())
 				.post(post)
 				.contents(dto.getContents())
 				.parentComment(parentComment)
 				.build();
-		
+
 		commentRepository.save(comment);
-		
+
 		return comment;
 	}
 

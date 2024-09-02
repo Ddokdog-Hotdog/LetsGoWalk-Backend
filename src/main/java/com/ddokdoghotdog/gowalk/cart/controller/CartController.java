@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ddokdoghotdog.gowalk.cart.dto.ShopCartsRequestDTO;
 import com.ddokdoghotdog.gowalk.cart.dto.ShopCartsUpdateRequestDTO;
 import com.ddokdoghotdog.gowalk.cart.service.CartService;
+import com.ddokdoghotdog.gowalk.global.annotation.RequiredMemberId;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,38 +28,33 @@ public class CartController {
 	@Autowired
 	private CartService cartService;
 	
+	@RequiredMemberId
 	@PostMapping("register")
-	public ResponseEntity<?> insertCart(@RequestBody ShopCartsRequestDTO shopCartsRequestDTO){
-		// 멤버id 넣는 과정 필요
-		long memberId = 2;
+	public ResponseEntity<?> insertCart(@RequestBody ShopCartsRequestDTO shopCartsRequestDTO, Long memberId){
 		cartService.insertCart(shopCartsRequestDTO, memberId);
 		return ResponseEntity.status(HttpStatus.OK)
 						.body("장바구니 등록 성공");
 	}
 	
-	
+	@RequiredMemberId
 	@GetMapping("")
-	public ResponseEntity<?> getCartItemList(){
-		// 멤버id 넣는 과정 필요
-		long memberId = 2;
+	public ResponseEntity<?> getCartItemList(Long memberId){
 		Map<String,Object> cartItemList = cartService.getCartItemList(memberId);
 		return ResponseEntity.status(HttpStatus.OK)
 						.body(cartItemList);
 	}
 	
+	@RequiredMemberId
 	@PutMapping("update")
-	public ResponseEntity<?> updateCartItem(@RequestBody ShopCartsUpdateRequestDTO shopCartsUpdateRequestDTO){
-		// 멤버id 넣는 과정 필요
-		long memberId = 2;
+	public ResponseEntity<?> updateCartItem(@RequestBody ShopCartsUpdateRequestDTO shopCartsUpdateRequestDTO, Long memberId){
 		cartService.updateCart(shopCartsUpdateRequestDTO, memberId);
 		return ResponseEntity.status(HttpStatus.OK)
 						.body("장바구니 수량 변경 완료");
 	}
 	
+	@RequiredMemberId
 	@DeleteMapping("delete")
-	public ResponseEntity<?> deleteCartItem(@RequestBody ShopCartsUpdateRequestDTO shopCartsUpdateRequestDTO){
-		// 멤버id 넣는 과정 필요
-		long memberId = 2;
+	public ResponseEntity<?> deleteCartItem(@RequestBody ShopCartsUpdateRequestDTO shopCartsUpdateRequestDTO, Long memberId){
 		cartService.deleteCart(shopCartsUpdateRequestDTO, memberId);
 		return ResponseEntity.status(HttpStatus.OK)
 						.body("장바구니에서 제거 완료");

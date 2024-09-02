@@ -37,9 +37,9 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/post")
 @AllArgsConstructor
 public class PostController {
-	
-	private final PostService postService;
 
+	private final PostService postService;
+	
 	@GetMapping("board/{boardid}")
 	@Operation(summary = "게시글 조회", description = "게시글을 조회합니다.")
     public ResponseEntity<List<PostGetListResponseDTO>> getPostList(@PathVariable("boardid") Long boardid,
@@ -93,12 +93,11 @@ public class PostController {
         Long memberId = Long.parseLong(principal.getName());
     	
     	postService.editPost(postid, requestDTO, images, memberId);
-        
         return ResponseEntity.ok().build();
     }
 
-    
     @DeleteMapping("/{postid}")
+
     @Operation(summary = "게시글 삭제", description = "게시글을 삭제합니다.")
     public ResponseEntity<Void> deletePost(@PathVariable("postid") Long postid, @RequestBody PostDetailDeleteRequestDTO dto, Principal principal) {
         
@@ -117,7 +116,4 @@ public class PostController {
         Long likeCount = postService.getLikesCount(postid);
         return ResponseEntity.ok(likeCount);
     }
-    
-    
-    
 }
