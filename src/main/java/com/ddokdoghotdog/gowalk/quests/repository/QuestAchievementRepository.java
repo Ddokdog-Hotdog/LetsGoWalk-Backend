@@ -14,5 +14,7 @@ public interface QuestAchievementRepository extends JpaRepository<QuestAchieveme
     
 	List<QuestAchievement> findByMemberIdAndRewardDate(Long memberId, Date rewardDate);
 	
-	void deleteByIsRewardedFalse();
+	void deleteByRewardDateIsNull();
+
+	List<QuestAchievement> findByMemberId(Long memberId);
 }

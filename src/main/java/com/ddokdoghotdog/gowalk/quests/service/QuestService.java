@@ -2,6 +2,7 @@ package com.ddokdoghotdog.gowalk.quests.service;
 
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -58,20 +59,34 @@ public class QuestService {
     }
  
     public List<QuestDTO> getVisibleQuestsAndAchievementsForToday(Long memberId) {
-        Date today = new Date(System.currentTimeMillis());
+    	 LocalDate today = LocalDate.now();
 
-        // 오늘 달성한 퀘스트들 가져오기
-        List<QuestAchievement> achievements = questAchievementRepository.findByMemberIdAndRewardDate(memberId, today);
-
-        // isVisible이 true인 모든 퀘스트들 가져오기
+     // 모든 퀘스트 가져오기 (isVisible이 true인 퀘스트들)
         List<Quest> visibleQuests = questRepository.findByIsVisibleTrue();
 
+        // 해당 멤버의 모든 퀘스트 달성 기록 가져오기
+        List<QuestAchievement> achievements = questAchievementRepository.findByMemberId(memberId);
+
         // visibleQuests를 순회하면서 QuestDTO 리스트로 변환
-        List<QuestDTO> questsAndAchievements = visibleQuests.stream()
+        return visibleQuests.stream()
             .map(quest -> {
-                // 해당 퀘스트가 오늘 달성된 퀘스트 목록에 있는지 확인
-                boolean isCompleted = achievements.stream()
-                    .anyMatch(a -> a.getQuest().getId().equals(quest.getId()));
+                Optional<QuestAchievement> optionalAchievement = achievements.stream()
+                    .filter(a -> a.getQuest().getId().equals(quest.getId()))
+                    .findFirst();
+
+                boolean isCompleted = optionalAchievement.isPresent();
+                boolean isRewarded = false;
+
+                if (isCompleted) {
+                    QuestAchievement achievement = optionalAchievement.get();
+                    // rewardDate가 null이 아니고 오늘인 경우 보상이 이루어짐
+                    if (achievement.getRewardDate() != null) {
+                        LocalDate rewardDate = achievement.getRewardDate().toLocalDate();
+                        if (today.equals(rewardDate)) {
+                            isRewarded = true;
+                        }
+                    }
+                }
 
                 return QuestDTO.builder()
                     .questId(quest.getId())
@@ -79,16 +94,11 @@ public class QuestService {
                     .description(quest.getDescription())
                     .questPoint(quest.getAchievementPoints().intValue())
                     .completed(isCompleted)
-                    .isReward(isCompleted && achievements.stream()
-                            .filter(a -> a.getQuest().getId().equals(quest.getId()))
-                            .findFirst()
-                            .map(QuestAchievement::getIsRewarded)
-                            .orElse(false))
+                    .isReward(isRewarded)
                     .build();
             })
             .collect(Collectors.toList());
 
-        return questsAndAchievements;
     }
 
     public List<QuestAchievementDTO> getQuestAchievementsForToday(Long memberId) {
@@ -114,29 +124,33 @@ public class QuestService {
         QuestAchievement.QuestAchievementId achievementId = new QuestAchievement.QuestAchievementId();
         achievementId.setMemberid(memberId);
         achievementId.setQuestid(questId);
-        
+
         Optional<QuestAchievement> achievementOpt = questAchievementRepository.findById(achievementId);
 
         if (achievementOpt.isPresent()) {
             QuestAchievement achievement = achievementOpt.get();
-            if (!achievement.getIsRewarded()) {
+
+            if (achievement.getRewardDate() == null && !achievement.getIsRewarded()) {
                 
                 Member member = achievement.getMember();
                 Quest quest = achievement.getQuest();
+
                 member.setPoint(member.getPoint() + quest.getAchievementPoints());
 
                 achievement.setIsRewarded(true);
                 achievement.setRewardDate(new Date(System.currentTimeMillis()));
+
                 memberRepository.save(member);
                 questAchievementRepository.save(achievement);
             }
         }
     }
+
     
     @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void deleteUnrewardedAchievements() {
-        questAchievementRepository.deleteByIsRewardedFalse();
+    	questAchievementRepository.deleteByRewardDateIsNull();
     }
 
 }
