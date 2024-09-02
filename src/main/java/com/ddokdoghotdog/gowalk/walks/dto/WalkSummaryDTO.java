@@ -124,6 +124,10 @@ public class WalkSummaryDTO {
                     .collect(Collectors.groupingBy(walk -> {
                         Calendar cal = Calendar.getInstance();
                         cal.setTime(walk.getStartTime());
+                        cal.set(Calendar.HOUR_OF_DAY, 0);
+                        cal.set(Calendar.MINUTE, 0);
+                        cal.set(Calendar.SECOND, 0);
+                        cal.set(Calendar.MILLISECOND, 0);
                         return cal.getTime();
                     }));
 
@@ -147,5 +151,15 @@ public class WalkSummaryDTO {
                     .dailyWalks(dailyWalkSummaries)
                     .build();
         }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class NearbyWalkPathsRequest {
+        private double latitude;
+        private double longitude;
+
     }
 }
