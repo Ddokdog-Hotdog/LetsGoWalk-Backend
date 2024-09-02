@@ -2,6 +2,7 @@ package com.ddokdoghotdog.gowalk.payment.service;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,6 @@ import com.ddokdoghotdog.gowalk.payment.repository.OrdersRepository;
 import com.ddokdoghotdog.gowalk.payment.repository.PaymentRepository;
 import com.ddokdoghotdog.gowalk.product.repository.ProductRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -74,10 +74,10 @@ public class PaymentService {
 			throw new BusinessException(ErrorCode.LACK_STOCK);
 		}
 		
-		product.toBuilder()
-				.stockQuantity(product.getStockQuantity() - orderItem.getQuantity())
-				.build();
-		productRepository.save(product);
+		
+		productRepository.save(product.toBuilder()
+						.stockQuantity(product.getStockQuantity() - orderItem.getQuantity())
+						.build());
 		log.info("재고 업데이트 완료");
 		
 		// 카카오페이와 연동되는 총 주문id를 찾지 못하는지 확인
@@ -90,6 +90,7 @@ public class PaymentService {
 								.createdAt(new Timestamp(System.currentTimeMillis()))
 								.product(product)
 								.order(order)
+								.status(true)
 								.build();
 		orderItemsRepository.save(item);
 		log.info("주문 상품 테이블 insert 완료");
@@ -153,13 +154,38 @@ public class PaymentService {
 //		log.info("회원 테이블에서 포인트 갱신 완료");
 		
 		// 장바구니 제거
-//		List<ShopOrderItemDTO> orderItems = shopOrderRequestDTO.getOrderItems();
-//		for(ShopOrderItemDTO cartItem : orderItems) {
-//			CartItem cart = cartRepository.findById(cartItem.getCartItemId())
-//				.orElseThrow(() -> new BusinessException(ErrorCode.CARTITEM_NOT_FOUND));
-//			cartRepository.delete(cart);
-//		}
-//		log.info("장바구니에서 결제 목록들 제거 완료");
+		/*
+		 * 정상 결제 경우의 수
+			- 바로 단건 결제
+			- 장바구니에 담은 후 단건결제
+			- 장바구니에 담은 후 여러건결제
+		
+		  이외의 경우의수에 대해서는 비정상적인 결제 요청
+		 */
+		List<ShopOrderItemDTO> orderItems = shopOrderRequestDTO.getOrderItems();
+		if(orderItems.size() == 1) {
+			// 단건 결제인 경우
+			ShopOrderItemDTO orderItem = orderItems.get(0);
+			if(orderItem.getCartItemId() == 0L) {
+				// 바로 단건 결제인 경우
+				log.info("장바구니를 거치지 않는 단건 결제");
+			}else {
+				// 장바구니에 담은 후 단건결제인 경우
+				CartItem cart = cartRepository.findById(orderItem.getCartItemId())
+						.orElseThrow(() -> new BusinessException(ErrorCode.CARTITEM_NOT_FOUND));
+//				cartRepository.delete(cart);
+				log.info("장바구니를 거치는 단건 결제");
+			}
+		}else {
+			// 여러건 결제인 경우
+			for(ShopOrderItemDTO cartItem : orderItems) {
+				
+				CartItem cart = cartRepository.findById(cartItem.getCartItemId())
+						.orElseThrow(() -> new BusinessException(ErrorCode.CARTITEM_NOT_FOUND));
+//				cartRepository.delete(cart);
+			}
+			log.info("장바구니를 거치는 여러 건 결제");
+		}
 		
 		// 롤백 테스트용
 		// throw new RuntimeException("롤백 테스트 용");
@@ -167,6 +193,7 @@ public class PaymentService {
 	
 	
 	// 주문ID로 결제정보 가져오기
+	@Transactional
 	public Payment findByOrder(Order order) {
 		Payment payment = paymentRepository.findByOrder(order)
 				.orElseThrow(() -> new BusinessException(ErrorCode.PAYMENT_NOT_FOUND));

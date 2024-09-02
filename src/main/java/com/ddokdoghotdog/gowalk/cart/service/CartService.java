@@ -98,7 +98,8 @@ public class CartService {
 	
 	// 장바구니 수량 변경
 	public void updateCart(ShopCartsUpdateRequestDTO shopCartsUpdateRequestDTO, Long memberId) {
-		CartItem cartItem = cartRepository.findById(shopCartsUpdateRequestDTO.getCartItemId()).get();
+		CartItem cartItem = cartRepository.findById(shopCartsUpdateRequestDTO.getCartItemId())
+				.orElseThrow(() -> new BusinessException(ErrorCode.CARTITEM_NOT_FOUND));
 		cartRepository.save(cartItem.toBuilder()
 									.quantity(shopCartsUpdateRequestDTO.getQuantity())
 									.build());
@@ -107,7 +108,8 @@ public class CartService {
 	
 	// 장바구니에서 제거
 	public void deleteCart(ShopCartsUpdateRequestDTO shopCartsUpdateRequestDTO, Long memberId) {
-		CartItem cartItem = cartRepository.findById(shopCartsUpdateRequestDTO.getCartItemId()).get();
+		CartItem cartItem = cartRepository.findById(shopCartsUpdateRequestDTO.getCartItemId())
+				.orElseThrow(() -> new BusinessException(ErrorCode.CARTITEM_NOT_FOUND));
 		cartRepository.delete(cartItem);
 	}
 	
