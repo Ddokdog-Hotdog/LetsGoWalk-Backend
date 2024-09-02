@@ -37,15 +37,39 @@ public class PaymentController {
     public String ready(@PathVariable("agent") String agent, @PathVariable("openType") String openType,
     					@RequestBody(required = false) ShopOrderRequestDTO shopOrderRequestDTO, Long memberId) {
 		
-		
-		// 테스트용
+		// 테스트용 - 시작
 		List<ShopOrderItemDTO> orderItems = new ArrayList<>();
+		
+		// 장바구니에 담지 않는 단건 결제 테스트용
+//		orderItems.add(ShopOrderItemDTO.builder()
+//						.cartItemId(0L) // 만약 장바구니에 담지 않고 바로 단건 결제하는 경우 cartItemId에 0L을 넣는다.
+//						.productId(2L)
+//						.productName("Sample Product2")
+//						.quantity(1L)
+//						.build());
+		
+		// 장바구니에 담는 단건 결제 테스트용
 		orderItems.add(ShopOrderItemDTO.builder()
-						.cartItemId(1L)
-						.productId(1L)
-						.productName("Sample 상품")
-						.quantity(1L)
-						.build());
+				.cartItemId(24L) 
+				.productId(4L)
+				.productName("Sample Product4")
+				.quantity(1L)
+				.build());
+		
+		// 장바구니에 담는 여러건 결제 테스트용
+//		orderItems.add(ShopOrderItemDTO.builder()
+//				.cartItemId(23L) 
+//				.productId(3L)
+//				.productName("Sample Product3")
+//				.quantity(1L)
+//				.build());
+//		orderItems.add(ShopOrderItemDTO.builder()
+//				.cartItemId(24L) 
+//				.productId(4L)
+//				.productName("Sample Product4")
+//				.quantity(1L)
+//				.build());
+		
 		ShopOrderRequestDTO testRequest = ShopOrderRequestDTO.builder()
 							.orderItems(orderItems)
 							.totalAmount(10000)
@@ -53,7 +77,9 @@ public class PaymentController {
 							.point(0L)
 							.build();
 		ShopReadyResponseDTO readyResponse = kakaoPayService.ready(agent, openType, testRequest, memberId);
+		// 테스트 용 - 끝
 		
+		// 실제 배포 시 아래 코드 주석 해제
 //		ShopReadyResponseDTO readyResponse = kakaoPayService.ready(agent, openType, shopOrderRequestDTO, memberId);
         if (agent.equals("mobile")) {
             // 모바일은 결제대기 화면으로 redirect 한다.
@@ -77,26 +103,16 @@ public class PaymentController {
 
 	@ResponseBody
     @GetMapping("/cancel/{agent}/{openType}")
-    public ResponseEntity<?> cancel(@PathVariable("agent") String agent, @PathVariable("openType") String openType) {
-        // 주문건이 진짜 취소되었는지 확인 후 취소 처리
+    public void cancel(@PathVariable("agent") String agent, @PathVariable("openType") String openType) {
 		log.info("결제가 취소되었습니다!!");
-        // 결제내역조회(/v1/payment/status) api에서 status를 확인한다.
-        // To prevent the unwanted request cancellation caused by attack,
-        // the “show payment status” API is called and then check if the status is QUIT_PAYMENT before suspending the payment
-		return ResponseEntity.status(HttpStatus.OK)
-				.body("결제취소");
+		kakaoPayService.cancelAndFail();
     }
 
 	@ResponseBody
     @GetMapping("/fail/{agent}/{openType}")
-    public ResponseEntity<?> fail(@PathVariable("agent") String agent, @PathVariable("openType") String openType) {
+    public void fail(@PathVariable("agent") String agent, @PathVariable("openType") String openType) {
 		log.info("결제가 실패되었습니다!!");
-        // 주문건이 진짜 실패되었는지 확인 후 실패 처리
-        // 결제내역조회(/v1/payment/status) api에서 status를 확인한다.
-        // To prevent the unwanted request cancellation caused by attack,
-        // the “show payment status” API is called and then check if the status is FAIL_PAYMENT before suspending the payment
-		return ResponseEntity.status(HttpStatus.OK)
-				.body("결제실패");
+		kakaoPayService.cancelAndFail();
     }
 	
 	@RequiredMemberId

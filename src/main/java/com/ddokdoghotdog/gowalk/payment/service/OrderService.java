@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ddokdoghotdog.gowalk.entity.Order;
 import com.ddokdoghotdog.gowalk.global.exception.BusinessException;
@@ -31,6 +32,7 @@ public class OrderService {
 	}
 	
 	// Orderid로 주문 정보 가져오기
+	@Transactional
 	public Order findById(Long orderId) {
 		Order order = ordersRepository.findById(orderId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
