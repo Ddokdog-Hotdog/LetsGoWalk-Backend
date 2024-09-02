@@ -15,6 +15,8 @@ import com.ddokdoghotdog.gowalk.auth.repository.MemberRepository;
 import com.ddokdoghotdog.gowalk.entity.Member;
 import com.ddokdoghotdog.gowalk.entity.Quest;
 import com.ddokdoghotdog.gowalk.entity.QuestAchievement;
+import com.ddokdoghotdog.gowalk.global.exception.BusinessException;
+import com.ddokdoghotdog.gowalk.global.exception.ErrorCode;
 import com.ddokdoghotdog.gowalk.quests.dto.QuestAchievementDTO;
 import com.ddokdoghotdog.gowalk.quests.dto.QuestDTO;
 import com.ddokdoghotdog.gowalk.quests.repository.QuestAchievementRepository;
@@ -33,10 +35,10 @@ public class QuestService {
     @Transactional
     public void completeQuest(Long memberId, Long questId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
         Quest quest = questRepository.findById(questId)
-                .orElseThrow(() -> new IllegalArgumentException("Quest not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.QUEST_NOT_FOUND));
 
 
         QuestAchievement achievement = QuestAchievement.builder()
