@@ -1,6 +1,5 @@
 package com.ddokdoghotdog.gowalk.entity;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 
 import jakarta.persistence.Column;
@@ -18,7 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -43,5 +42,10 @@ public class OrderItem {
     @ManyToOne
     @JoinColumn(name = "orderid", nullable = false)
     private Order order;
-
+    
+    // 환불 여부
+    // true이면(값이 1이면) => 환불 안 한 상태
+    // false이면(값이 0이면) => 환불 한 상태
+    @Column(name = "status", nullable = false)
+    private Boolean status;
 }
