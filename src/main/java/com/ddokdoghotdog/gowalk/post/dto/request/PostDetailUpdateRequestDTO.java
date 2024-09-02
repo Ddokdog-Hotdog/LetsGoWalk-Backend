@@ -20,6 +20,5 @@ public class PostDetailUpdateRequestDTO {
     private String title;
     private String contents;
     private LocalDateTime updatedAt;
-    private String img;
     
 }

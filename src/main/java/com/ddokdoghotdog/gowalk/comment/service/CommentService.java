@@ -26,15 +26,13 @@ public class CommentService {
 	private final MemberRepository memberRepository;
 	private final PostRepository postRepository;
 	private final CommentRepository commentRepository;
-
-	public Comment createComment(CommentWriteRequestDTO dto) {
-
-		Member member = memberRepository.findById(dto.getMemberid())
-				.orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-
-		Post post = postRepository.findById(dto.getPostid())
-				.orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
-
+	
+	// 댓글 작성
+	public Comment createComment(CommentWriteRequestDTO dto, Long memberId) {
+		
+		Post post = postRepository.findByIdAndMemberId(dto.getPostid(), memberId)
+	            .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+		
 		Comment parentComment = null;
 		if (dto.getCommentsid() != null) {
 			parentComment = commentRepository.findById(dto.getCommentsid())
@@ -42,7 +40,7 @@ public class CommentService {
 		}
 
 		Comment comment = Comment.builder()
-				.member(member)
+				.member(post.getMember())
 				.post(post)
 				.contents(dto.getContents())
 				.parentComment(parentComment)
@@ -53,23 +51,30 @@ public class CommentService {
 		return comment;
 	}
 
-	public void editComment(Long commentid, CommentEditRequestDTO dto) {
-
+	//댓글 수정
+	public void editComment(Long commentid, CommentEditRequestDTO dto, Long memberId) {
+		
 		Comment comment = commentRepository.findById(commentid)
 				.orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND));
-
+		
+	    if (!comment.getMember().getId().equals(memberId)) {
+	        throw new BusinessException(ErrorCode.NO_PERMISSION);
+	    }
+		
 		comment.setContents(dto.getContents());
-
 		commentRepository.save(comment);
 	}
 
-	public void deleteComment(Long commentid, CommentDeleteRequestDTO dto) {
-
+	// 댓글 삭제
+	public void deleteComment(Long commentid, CommentDeleteRequestDTO dto, Long memberId) {
+		
 		Comment comment = commentRepository.findById(commentid)
 				.orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND));
-
+		
+	    if (!comment.getMember().getId().equals(memberId)) {
+	        throw new BusinessException(ErrorCode.NO_PERMISSION);
+	    }
 		commentRepository.delete(comment);
-
 	}
-
+	
 }
