@@ -44,13 +44,12 @@ public class WalkController {
     @PostMapping("/daily")
     public ResponseEntity<WalkSummaryDTO.DailyWalkSummaryResponse> getDailyWalks(
             @RequestBody WalkSummaryDTO.DailyWalkSummaryRequest walkSummaryDTO) {
-        return null;
+        return new ResponseEntity<>(walkReadService.getDailyWalk(walkSummaryDTO), HttpStatus.OK);
     }
 
     @PostMapping("/monthly")
     public ResponseEntity<WalkSummaryDTO.MonthlyWalkSummaryResponse> getMonthlyWalks(
             @RequestBody WalkSummaryDTO.MonthlyWalkSummaryRequest walkSummaryDTO) {
-        return null;
+        return new ResponseEntity<>(walkReadService.getMonthlyWalk(walkSummaryDTO), HttpStatus.OK);
     }
-
 }
