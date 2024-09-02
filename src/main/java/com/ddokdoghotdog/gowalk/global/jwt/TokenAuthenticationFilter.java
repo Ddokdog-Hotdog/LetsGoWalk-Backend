@@ -1,8 +1,9 @@
 package com.ddokdoghotdog.gowalk.global.jwt;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 import java.io.IOException;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -57,5 +58,5 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             return null;
         }
         return token.substring(TOKEN_PREFIX.length());
-    }
+    } 
 }

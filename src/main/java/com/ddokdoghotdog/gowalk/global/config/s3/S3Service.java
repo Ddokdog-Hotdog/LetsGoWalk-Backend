@@ -34,7 +34,7 @@ public class S3Service {
 
     @Transactional
     public String uploadFile(MultipartFile uploadFile, String folder) throws AmazonS3Exception {
-        if(!folder.equals("products") && !folder.equals("member"))
+        if(!folder.equals("products") && !folder.equals("member") && !folder.equals("posts"))
             throw new AmazonS3Exception("이미지 링크 오류");
 
         String origName = uploadFile.getOriginalFilename();

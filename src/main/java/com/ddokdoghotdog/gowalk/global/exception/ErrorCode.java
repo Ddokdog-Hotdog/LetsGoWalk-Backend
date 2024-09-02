@@ -18,6 +18,8 @@ public enum ErrorCode {
     ALREADY_LIKE_REQUEST("이미 찜을 누른 상품입니다.", 400),
     INVALID_REFUND_REQUEST("유효하지 않은 환불요청입니다.", 400),
     ALREADY_REFUND_REQUEST("이미 환불을 마친 상품입니다.", 400),
+    ALREADY_CATEGORY_REQUEST("이미 등록을 한 카테고리입니다.", 400),
+    ALREADY_VENDOR_REQUEST("이미 등록을 한 판매업체입니다.", 400),
 
     // 401 Unauthorized
     EXPIRED_TOKEN("만료된 토큰입니다. 재로그인이 필요합니다.", 401),
@@ -40,6 +42,8 @@ public enum ErrorCode {
     POST_NOT_FOUND("존재하지 않는 게시글입니다.", 404),
     BOARD_NOT_FOUND("존재하지 않는 게시판입니다.", 404),
     COMMENT_NOT_FOUND("존재하지 않는 댓글입니다.", 404),
+    POST_OR_MEMBER_NOT_FOUND("게시글 혹은 유저가 존재하지 않습니다.", 404),
+    QUEST_NOT_FOUND("존재하지 않는 퀘스트 ID입니다.", 404),
 
     WALK_NOT_FOUND("존재하지 않는 산책정보입니다.", 404),
 
@@ -65,6 +69,8 @@ public enum ErrorCode {
     CART_ITEM_INSERT_ERROR("장바구니 담기에 실패하였습니다.", 500),
     PAYMENT_ERROR("결제에 실패하였습니다.", 500),
     REFUND_ERROR("환불에 실패하였습니다.", 500),
+    VENDOR_DELETE_ERROR("해당 판매업체로 등록된 상품을 먼저 삭제해주십시오.", 500),
+    CATEGORY_DELETE_ERROR("해당 카테고리로 등록된 상품을 먼저 삭제해주십시오.", 500),
 
     /* Spring Basic Exceptions */
     INTERNAL_SERVER_ERROR("서버 오류가 발생했습니다.", 500);

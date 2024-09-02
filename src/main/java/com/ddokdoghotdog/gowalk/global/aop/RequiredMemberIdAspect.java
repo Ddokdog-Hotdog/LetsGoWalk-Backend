@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RequiredMemberIdAspect {
 
 	// 테스트 용 memberId 직접 주입
-	private Long defaultId = 3L;
+	private Long defaultId = 2L;
 
 	@Around("@annotation(com.ddokdoghotdog.gowalk.global.annotation.RequiredMemberId)")
 	public Object requiredMemberId(ProceedingJoinPoint joinPoint) throws Throwable {

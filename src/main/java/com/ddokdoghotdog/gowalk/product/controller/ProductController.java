@@ -115,5 +115,50 @@ public class ProductController {
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(productId + "번 상품 찜 해제 성공");
 	}
-
+	
+	// 카테고리 등록
+	@PostMapping("category/insert")
+	public ResponseEntity<?> insertCategory(@RequestParam("category") String category){
+		productService.insertCategory(category);
+		return ResponseEntity.status(HttpStatus.OK)
+				.body("카테고리 등록 성공");
+	}
+	
+	// 카테고리 목록 가져오기
+	@GetMapping("category/list")
+	public ResponseEntity<?> findCategoryAll(){
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(productService.findCategoryAll());
+	}
+	
+	// 카테고리 삭제
+	@DeleteMapping("category/delete")
+	public ResponseEntity<?> deleteCategory(@RequestParam("categoryId") Long categoryId){
+		productService.deleteCategory(categoryId);
+		return ResponseEntity.status(HttpStatus.OK)
+				.body("카테고리 삭제 성공");
+	}
+	
+	// 판매업체 등록
+	@PostMapping("vendor/insert")
+	public ResponseEntity<?> insertVendor(@RequestParam("vendor") String vendor){
+		productService.insertCategory(vendor);
+		return ResponseEntity.status(HttpStatus.OK)
+				.body("판매업체 등록 성공");
+	}
+	
+	// 판매업체 목록 가져오기
+	@GetMapping("vendor/list")
+	public ResponseEntity<?> findVendorAll(){
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(productService.findVendorAll());
+	}
+	
+	// 판매업체 삭제
+	@DeleteMapping("vendor/delete")
+	public ResponseEntity<?> vendorCategory(@RequestParam("vendorId") Long vendorId){
+		productService.deleteVendor(vendorId);
+		return ResponseEntity.status(HttpStatus.OK)
+				.body("판매업체 삭제 성공");
+	}
 }
