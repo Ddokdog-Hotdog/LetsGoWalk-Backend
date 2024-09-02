@@ -1,4 +1,4 @@
-package com.ddokdoghotdog.gowalk.auth.controller;
+package com.ddokdoghotdog.gowalk.member.controller;
 
 import java.sql.Date;
 
@@ -25,17 +25,14 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @RestController
-public class AuthController {
+public class MemberController {
+
+
 
     private final TokenService tokenService;
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
-  
 
-    @GetMapping("/success")
-    public ResponseEntity<String> loginSuccess(@RequestParam("accessToken") String accessToken) {
-        return ResponseEntity.ok(accessToken);
-    }
 
     @DeleteMapping("/logout")
     public ResponseEntity<Void> logout(@AuthenticationPrincipal UserDetails userDetails) {

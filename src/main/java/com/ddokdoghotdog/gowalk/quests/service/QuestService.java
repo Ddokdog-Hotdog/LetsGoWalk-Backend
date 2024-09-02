@@ -2,10 +2,9 @@ package com.ddokdoghotdog.gowalk.quests.service;
 
 
 import java.sql.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -15,6 +14,9 @@ import com.ddokdoghotdog.gowalk.auth.repository.MemberRepository;
 import com.ddokdoghotdog.gowalk.entity.Member;
 import com.ddokdoghotdog.gowalk.entity.Quest;
 import com.ddokdoghotdog.gowalk.entity.QuestAchievement;
+import com.ddokdoghotdog.gowalk.entity.QuestAchievement.QuestAchievementId;
+import com.ddokdoghotdog.gowalk.quests.dto.QuestAchievementDTO;
+import com.ddokdoghotdog.gowalk.quests.dto.QuestDTO;
 import com.ddokdoghotdog.gowalk.quests.repository.QuestAchievementRepository;
 import com.ddokdoghotdog.gowalk.quests.repository.QuestRepository;
 
@@ -28,25 +30,83 @@ public class QuestService {
     private final QuestAchievementRepository questAchievementRepository;
     private final MemberRepository memberRepository;
 
+    @Transactional
+    public void completeQuest(Long memberId, Long questId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
 
-    public Map<String, Object> getQuestsWithStatus(Long memberId) {
-        List<Quest> quests = questRepository.findAll();  
-        List<QuestAchievement> achievements = getTodayAchievements(memberId);  
+        Quest quest = questRepository.findById(questId)
+                .orElseThrow(() -> new IllegalArgumentException("Quest not found"));
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("quests", quests);
-        result.put("achievements", achievements);
-        return result;   
+        QuestAchievementId id = new QuestAchievementId();
+        id.setMemberid(memberId);
+        id.setQuestid(questId);
+
+        QuestAchievement achievement = QuestAchievement.builder()
+                .id(id)
+                .member(member)
+                .quest(quest)
+                .isRewarded(false)
+                .rewardDate(null)
+                .build();
+
+        questAchievementRepository.save(achievement);
     }
     
-    public List<QuestAchievement> getTodayAchievements(Long memberId) {
+    public List<Quest> getQuestList() {
+        return questRepository.findByIsVisibleTrue();
+    }
+ 
+    public List<QuestDTO> getVisibleQuestsAndAchievementsForToday(Long memberId) {
         Date today = new Date(System.currentTimeMillis());
-        return questAchievementRepository.findByMemberIdAndRewardDate(memberId, today);
+
+        // 오늘 달성한 퀘스트들 가져오기
+        List<QuestAchievement> achievements = questAchievementRepository.findByMemberIdAndRewardDate(memberId, today);
+
+        // isVisible이 true인 모든 퀘스트들 가져오기
+        List<Quest> visibleQuests = questRepository.findByIsVisibleTrue();
+
+        // visibleQuests를 순회하면서 QuestDTO 리스트로 변환
+        List<QuestDTO> questsAndAchievements = visibleQuests.stream()
+            .map(quest -> {
+                // 해당 퀘스트가 오늘 달성된 퀘스트 목록에 있는지 확인
+                boolean isCompleted = achievements.stream()
+                    .anyMatch(a -> a.getQuest().getId().equals(quest.getId()));
+
+                return QuestDTO.builder()
+                    .questId(quest.getId())
+                    .questName(quest.getName())
+                    .description(quest.getDescription())
+                    .questPoint(quest.getAchievementPoints().intValue())
+                    .completed(isCompleted)
+                    .isReward(isCompleted && achievements.stream()
+                            .filter(a -> a.getQuest().getId().equals(quest.getId()))
+                            .findFirst()
+                            .map(QuestAchievement::getIsRewarded)
+                            .orElse(false))
+                    .build();
+            })
+            .collect(Collectors.toList());
+
+        return questsAndAchievements;
     }
 
-    public List<Quest> getAllQuests() {
-        return questRepository.findAll();
+    public List<QuestAchievementDTO> getQuestAchievementsForToday(Long memberId) {
+        Date today = new Date(System.currentTimeMillis());
+        
+        List<QuestAchievement> achievements = questAchievementRepository.findByMemberIdAndRewardDate(memberId, today);
+
+        return achievements.stream()
+                .map(achievement -> QuestAchievementDTO.builder()
+                        .memberId(achievement.getMember().getId())
+                        .questId(achievement.getQuest().getId())
+                        .isRewarded(achievement.getIsRewarded())
+                        .rewardDate(achievement.getRewardDate())
+                        .build())
+                .collect(Collectors.toList());
     }
+    
+    
 
     @Transactional
     public void rewardPoints(Long memberId, Long questId) {
