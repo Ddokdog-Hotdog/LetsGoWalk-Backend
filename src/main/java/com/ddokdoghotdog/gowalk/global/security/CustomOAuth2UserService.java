@@ -1,6 +1,7 @@
 package com.ddokdoghotdog.gowalk.global.security;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -9,9 +10,11 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ddokdoghotdog.gowalk.auth.MemberRepository;
 import com.ddokdoghotdog.gowalk.auth.dto.PrincipalDetails;
-import com.ddokdoghotdog.gowalk.auth.entity.Member;
+import com.ddokdoghotdog.gowalk.auth.repository.MemberRepository;
+import com.ddokdoghotdog.gowalk.auth.repository.UserRoleRepository;
+import com.ddokdoghotdog.gowalk.entity.Member;
+import com.ddokdoghotdog.gowalk.entity.UserRole;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         private final MemberRepository memberRepository;
+        private final UserRoleRepository userRoleRepository;
 
         @Transactional
         @Override
@@ -48,7 +52,24 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 String email = oAuth2UserInfo.getEmail();
                 String provider = oAuth2UserInfo.getProvider();
                 Member member = memberRepository.findByEmailAndSocialProvider(email, provider)
-                                .orElseGet(oAuth2UserInfo::toEntity);
+                                .orElseGet(() -> createNewMember(oAuth2UserInfo));
                 return memberRepository.save(member);
+        }
+
+        private Member createNewMember(OAuth2UserInfo oAuth2UserInfo) {
+                UserRole roleUser = userRoleRepository.findByRole("ROLE_USER")
+                                .orElseThrow(() -> new IllegalArgumentException("ROLE_USER가 존재하지 않습니다."));
+
+                Member newMember = Member.builder()
+                                .nickname(oAuth2UserInfo.getNickname())
+                                .email(oAuth2UserInfo.getEmail())
+                                .socialProvider(oAuth2UserInfo.getProvider())
+                                .profileImageUrl(oAuth2UserInfo.getProfile())
+                                .role(roleUser)
+                                .memberKey(UUID.randomUUID().toString().replace("-", ""))
+                                .point(0L)
+                                .build();
+
+                return memberRepository.save(newMember);
         }
 }

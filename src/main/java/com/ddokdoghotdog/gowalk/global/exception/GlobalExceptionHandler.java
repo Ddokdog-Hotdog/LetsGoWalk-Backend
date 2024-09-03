@@ -2,11 +2,14 @@ package com.ddokdoghotdog.gowalk.global.exception;
 
 import java.nio.file.AccessDeniedException;
 
+import org.springframework.data.mongodb.UncategorizedMongoDbException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +51,22 @@ public class GlobalExceptionHandler {
         log.error("EntityNotFoundException", errorCode);
         final ErrorResponse response = new ErrorResponse(errorCode);
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(JsonProcessingException.class)
+    public ResponseEntity<ErrorResponse> handleJsonProcessingException(JsonProcessingException e) {
+        final ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+        log.error("JsonProcessingException", e);
+        final ErrorResponse response = new ErrorResponse(errorCode);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(UncategorizedMongoDbException.class)
+    protected ResponseEntity<ErrorResponse> handleMongoDBException(UncategorizedMongoDbException e) {
+        final ErrorCode errorCode = ErrorCode.MONGO_QUERY_EXECUTION_ERROR;
+        log.error("MongoDBException", e);
+        final ErrorResponse response = new ErrorResponse(errorCode);
+        return new ResponseEntity<>(response, HttpStatus.valueOf(errorCode.getStatus()));
     }
 
     // 최종 에러처리

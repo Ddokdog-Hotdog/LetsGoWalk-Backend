@@ -1,21 +1,22 @@
 package com.ddokdoghotdog.gowalk.global.security;
 
 import java.util.Map;
-import java.util.UUID;
 
-import com.ddokdoghotdog.gowalk.auth.entity.Member;
-import com.ddokdoghotdog.gowalk.auth.entity.Role;
+import com.ddokdoghotdog.gowalk.entity.Member;
 import com.ddokdoghotdog.gowalk.global.exception.BusinessException;
 import com.ddokdoghotdog.gowalk.global.exception.ErrorCode;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Builder
 @Getter
 @Slf4j
+@RequiredArgsConstructor
 public class OAuth2UserInfo {
+
     private final String nickname;
     private final String email;
     private final String profile;
@@ -63,13 +64,12 @@ public class OAuth2UserInfo {
     }
 
     public Member toEntity() {
+
         return Member.builder()
                 .nickname(nickname)
                 .email(email)
                 .socialProvider(provider)
                 .profileImageUrl(profile)
-                .role(Role.USER)
-                .memberKey(UUID.randomUUID().toString().replace("-", ""))
                 .build();
     }
 }
