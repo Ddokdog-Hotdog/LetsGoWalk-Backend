@@ -51,6 +51,22 @@ public class PostController {
         return ResponseEntity.ok(post);
     }
 	
+
+	@GetMapping("board/{boardid}/{memberid}")
+	@Operation(summary = "내가 작성한 글 리스트 불러오기", description = "마이페이지에서 내가 작성한 글들을 조회할 수 있습니다.")
+	public ResponseEntity<List<PostGetListResponseDTO>> getMyPostList(@PathVariable("boardid") Long boardid,
+																  @PathVariable("memberid") Long memberid,
+																  @RequestParam(name = "page" ,defaultValue = "0") int page, 
+																  @RequestParam(name = "size" ,defaultValue = "10") int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		
+		List<PostGetListResponseDTO> post = postService.getMyPostList(boardid, memberid, pageable);
+		return ResponseEntity.ok(post);
+		
+		
+		
+	}
+	
 	@GetMapping("/{postid}")
 	@Operation(summary = "게시글 상세 조회", description = "게시글 상세 내용을 조회합니다.")
 	public ResponseEntity<PostGetDetailResponseDTO> getPostDetail(@PathVariable("postid") Long postid){
