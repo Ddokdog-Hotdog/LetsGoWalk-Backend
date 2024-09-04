@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,8 +71,9 @@ public class WalkReadService {
 
                 // 주변 1km 탐색
                 int maxDistance = 1000;
+                Pageable limit = PageRequest.of(0, 100);
                 Timestamp fromDate = new Timestamp(System.currentTimeMillis() - 30 * 24 * 60 * 60 * 1000); // 30일 전
                 GeoJsonPoint location = new GeoJsonPoint(pointDTO.getLongitude(), pointDTO.getLatitude());
-                return walkPathRepository.findByLocationNear(location, maxDistance, fromDate);
+                return walkPathRepository.findByLocationNear(location, maxDistance, fromDate, limit);
         }
 }
