@@ -1,6 +1,5 @@
 package com.ddokdoghotdog.gowalk.pet.controller;
 
-import java.security.Principal;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -14,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ddokdoghotdog.gowalk.entity.Breed;
+import com.ddokdoghotdog.gowalk.global.annotation.RequiredMemberId;
 import com.ddokdoghotdog.gowalk.member.service.MemberService;
 import com.ddokdoghotdog.gowalk.pet.Service.PetReadService;
 import com.ddokdoghotdog.gowalk.pet.Service.PetWriteService;
@@ -29,11 +30,15 @@ public class PetController {
     private final PetWriteService petWriteService;
     private final MemberService memberService;
 
+    @RequiredMemberId
     @GetMapping("")
-    public ResponseEntity<List<PetDTO.Response>> getPetsByMember(Principal principal) {
-        String name = principal.getName();
-        Long memberId = Long.parseLong(name);
+    public ResponseEntity<List<PetDTO.Response>> getPetsByMember(Long memberId) {
         return new ResponseEntity<>(petReadService.getPetsByMemberId(memberId), HttpStatus.OK);
+    }
+
+    @GetMapping("/breeds")
+    public ResponseEntity<List<Breed>> getBreeds() {
+        return new ResponseEntity<>(petReadService.getBreedList(), HttpStatus.OK);
     }
 
     @GetMapping("/profile/{petId}")
@@ -51,10 +56,9 @@ public class PetController {
         return new ResponseEntity<>(petWriteService.updatePet(petUpdateRequsetDTO), HttpStatus.ACCEPTED);
     }
 
+    @RequiredMemberId
     @DeleteMapping("/{petId}")
-    public ResponseEntity<Void> deletePet(@PathVariable("petId") Long petId, Principal principal) {
-        String name = principal.getName();
-        Long memberId = Long.parseLong(name);
+    public ResponseEntity<Void> deletePet(@PathVariable("petId") Long petId, Long memberId) {
         petWriteService.deletePet(petId, memberId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

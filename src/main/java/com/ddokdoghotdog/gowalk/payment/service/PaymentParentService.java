@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ddokdoghotdog.gowalk.auth.repository.MemberRepository;
 import com.ddokdoghotdog.gowalk.entity.Member;
 import com.ddokdoghotdog.gowalk.entity.Order;
 import com.ddokdoghotdog.gowalk.entity.OrderItem;
@@ -21,35 +22,34 @@ import com.ddokdoghotdog.gowalk.payment.dto.ShopCancelRequestDTO;
 import com.ddokdoghotdog.gowalk.payment.dto.ShopOrderItemDTO;
 import com.ddokdoghotdog.gowalk.payment.dto.ShopOrderRequestDTO;
 import com.ddokdoghotdog.gowalk.payment.dto.ShopRefundRequestDTO;
+import com.ddokdoghotdog.gowalk.payment.repository.OrderItemsRepository;
+import com.ddokdoghotdog.gowalk.payment.repository.PaymentRepository;
+import com.ddokdoghotdog.gowalk.pet.repository.BreedRepository;
+import com.ddokdoghotdog.gowalk.pet.repository.PetRepository;
 import com.ddokdoghotdog.gowalk.product.repository.ProductRepository;
 import com.ddokdoghotdog.gowalk.product.service.ProductService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class PaymentParentService {
 
     @Value("${cid}")
     private String cid;
     
-	@Autowired
-	private PaymentSychService paymentSychService;
 	
-	@Autowired
-	private PaymentService paymentService;
-	
-	@Autowired
-	private OrderItemService orderItemService;
-	
-	@Autowired
-	private OrderService orderService;
-	
-	@Autowired
-	private ProductService productService;
-	
-	@Autowired
-	private ProductRepository productRepository;
+	private final PaymentSychService paymentSychService;
+	private final PaymentService paymentService;
+	private final OrderItemService orderItemService;
+	private final OrderService orderService;
+	private final ProductService productService;
+	private final ProductRepository productRepository;
+	private final MemberRepository memberRepository;
+	private final PaymentRepository paymentRepository;
+	private final OrderItemsRepository orderItemsRepository;
 	
 	@Transactional
 	public void processProduct(ShopOrderRequestDTO shopOrderRequestDTO, Long memberId, 
@@ -104,33 +104,32 @@ public class PaymentParentService {
     	log.info("환불 가격 : {}", refundPrice);
     	
     	// 5. orderItem의 status 0으로 바꾸기
-    	orderItem.toBuilder()
-    			.status(false)
-    			.build();
+    	orderItemsRepository.save(orderItem.toBuilder()
+		    			.status(false)
+		    			.build());
     	log.info("주문 상품 테이블의 상태 환불로 변경");
     	
     	// 5-1. 포인트를 사용했다면 멤버테이블의 포인트도 다시 수정
     	if(payment.getPointAmount() > 0) {
-    		member.toBuilder()
-    			.point(member.getPoint() + payment.getPointAmount())
-    			.build();
+    		memberRepository.save(member.toBuilder()
+		        			.point(member.getPoint() + payment.getPointAmount())
+		        			.build());
     		log.info("멤버 테이블 포인트 업데이트 완료");
     	}
     	
     	// 6. 결제테이블의 결제가격도 바꾸기 또는 포인트 사용했다면 포인트도 바꾸기
-    	payment.toBuilder()
-    			.payAmount(payment.getPayAmount() - refundPrice)
-    			.pointAmount(0L)
-    			.build();
+    	paymentRepository.save(payment.toBuilder()
+		    			.payAmount(payment.getPayAmount() - refundPrice)
+		    			.pointAmount(0L)
+		    			.build());
     	log.info("결제 테이블 수정 완료");
     	
     	// 7. 상품테이블의 재고 복구 -> 비관적락
 		Product products = productRepository.findByIdForUpdate(product.getId())
 				.orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
-		products.toBuilder()
-				.stockQuantity(products.getStockQuantity() + orderItem.getQuantity())
-				.build();
-		productRepository.save(product);
+		productRepository.save(products.toBuilder()
+						.stockQuantity(products.getStockQuantity() + orderItem.getQuantity())
+						.build());
 		log.info("재고 업데이트 완료");
 		
 		

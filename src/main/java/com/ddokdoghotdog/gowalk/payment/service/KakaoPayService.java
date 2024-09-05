@@ -24,6 +24,7 @@ import com.ddokdoghotdog.gowalk.payment.dto.ShopOrderRequestDTO;
 import com.ddokdoghotdog.gowalk.payment.dto.ShopReadyRequestDTO;
 import com.ddokdoghotdog.gowalk.payment.dto.ShopReadyResponseDTO;
 import com.ddokdoghotdog.gowalk.payment.dto.ShopRefundRequestDTO;
+import com.ddokdoghotdog.gowalk.product.service.ProductService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,7 +53,11 @@ public class KakaoPayService {
 	
 	@Autowired
 	private PaymentParentService paymentParentService;
+	
+	@Autowired
+	private ProductService productService;
 
+	@Transactional
     public ShopReadyResponseDTO ready(String agent, String openType, 
     									ShopOrderRequestDTO shopOrderRequestDTO, Long memberId) {
         this.userId = String.valueOf(memberId);
@@ -63,6 +68,10 @@ public class KakaoPayService {
         headers.add("Authorization", "DEV_SECRET_KEY " + kakaopaySecretKey);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
+        // 여기서 shopOrderRequestDTO에 대한 검증이 필요함 가격에 장난을 치지 않았는지
+        // 실제 요청이 온 것에 대한 productId에 대한 가격과 DB에 있는 가격을 비교해서 총 가격이 맞는지 확인한다.
+        productService.inspectShopOrderRequestDTO(shopOrderRequestDTO);
+        
         List<ShopOrderItemDTO> orderItems = shopOrderRequestDTO.getOrderItems();
         
         this.orderId = UUID.randomUUID().toString().replaceAll("-","");
@@ -74,7 +83,7 @@ public class KakaoPayService {
                 .partnerUserId(userId)
                 .itemName(orderItems.size() == 1 ? 
                 			orderItems.get(0).getProductName() : 
-                			orderItems.get(0).getProductName() + " 외 " + orderItems.size() + "개")
+                			orderItems.get(0).getProductName() + " 등 " + orderItems.size() + "개")
                 .quantity(1)
                 .totalAmount(shopOrderRequestDTO.getTotalAmount())
                 .taxFreeAmount(0)
@@ -134,7 +143,7 @@ public class KakaoPayService {
                     String.class
             );
 
-//            String approveResponse = response.getBody();
+            String approveResponse = response.getBody();
 
             return successRedirectURL;
         } 
@@ -171,6 +180,8 @@ public class KakaoPayService {
                     entityMap,
                     String.class
             );
+            
+            String cancelResponse = response.getBody();
         	
         } catch (HttpStatusCodeException ex) {
         	log.info("환불 실패 내용 : {}", ex.getResponseBodyAsString());
@@ -181,5 +192,9 @@ public class KakaoPayService {
         	throw new BusinessException(ErrorCode.REFUND_ERROR);
         }
     	
+    }
+    
+    public void cancelAndFail() {
+    	throw new BusinessException(ErrorCode.PAYMENT_ERROR);
     }
 }

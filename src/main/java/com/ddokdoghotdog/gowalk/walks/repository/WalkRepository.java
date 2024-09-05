@@ -38,4 +38,20 @@ public interface WalkRepository extends JpaRepository<Walk, Long> {
         List<Walk> findAllByPetOwnerMemberIdAndMonth(@Param("memberId") Long memberId,
                         @Param("year") int year,
                         @Param("month") int month);;
+
+        @Query("SELECT DISTINCT w FROM Walk w " +
+                        "LEFT JOIN FETCH w.petWalks pw " +
+                        "LEFT JOIN FETCH pw.pet p " +
+                        "LEFT JOIN FETCH p.member m " +
+                        "LEFT JOIN FETCH p.breed " +
+                        "LEFT JOIN FETCH m.role " +
+                        "WHERE m.id = :memberId " +
+                        "AND YEAR(w.startTime) = :year " +
+                        "AND MONTH(w.startTime) = :month " +
+                        "AND DAY(w.startTime) = :day")
+        List<Walk> findAllByPetOwnerMemberIdAndDay(@Param("memberId") Long memberId,
+                        @Param("year") int year,
+                        @Param("month") int month,
+                        @Param("day") int day);
+
 }

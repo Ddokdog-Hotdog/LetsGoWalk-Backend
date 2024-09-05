@@ -17,6 +17,7 @@ public class RequiredMemberIdAspect {
 	// 테스트 용 memberId 직접 주입
 	//private Long defaultId = 1L;
 
+
 	@Around("@annotation(com.ddokdoghotdog.gowalk.global.annotation.RequiredMemberId)")
 	public Object requiredMemberId(ProceedingJoinPoint joinPoint) throws Throwable {
 

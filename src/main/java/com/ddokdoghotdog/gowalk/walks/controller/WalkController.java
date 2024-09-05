@@ -1,5 +1,7 @@
 package com.ddokdoghotdog.gowalk.walks.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ddokdoghotdog.gowalk.walks.dto.WalkDTO;
 import com.ddokdoghotdog.gowalk.walks.dto.WalkSummaryDTO;
+import com.ddokdoghotdog.gowalk.walks.model.WalkPaths;
 import com.ddokdoghotdog.gowalk.walks.service.WalkReadService;
 import com.ddokdoghotdog.gowalk.walks.service.WalkWriteService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -44,13 +47,18 @@ public class WalkController {
     @PostMapping("/daily")
     public ResponseEntity<WalkSummaryDTO.DailyWalkSummaryResponse> getDailyWalks(
             @RequestBody WalkSummaryDTO.DailyWalkSummaryRequest walkSummaryDTO) {
-        return null;
+        return new ResponseEntity<>(walkReadService.getDailyWalk(walkSummaryDTO), HttpStatus.OK);
     }
 
     @PostMapping("/monthly")
     public ResponseEntity<WalkSummaryDTO.MonthlyWalkSummaryResponse> getMonthlyWalks(
             @RequestBody WalkSummaryDTO.MonthlyWalkSummaryRequest walkSummaryDTO) {
-        return null;
+        return new ResponseEntity<>(walkReadService.getMonthlyWalk(walkSummaryDTO), HttpStatus.OK);
     }
 
+    @PostMapping("/nearby")
+    public ResponseEntity<List<WalkPaths>> getNearbyPaths(
+            @RequestBody WalkSummaryDTO.NearbyWalkPathsRequest NearWalkPathDTO) {
+        return new ResponseEntity<>(walkReadService.getNearbyWalkPaths(NearWalkPathDTO), HttpStatus.OK);
+    }
 }

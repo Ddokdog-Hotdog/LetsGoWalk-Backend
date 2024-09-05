@@ -2,6 +2,7 @@ package com.ddokdoghotdog.gowalk.global.exception;
 
 import java.nio.file.AccessDeniedException;
 
+import org.springframework.data.mongodb.UncategorizedMongoDbException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -67,6 +68,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
         String errorMessage = ex.getBindingResult().getFieldError().getDefaultMessage();
         return ResponseEntity.badRequest().body(errorMessage);
+    }
+
+    @ExceptionHandler(UncategorizedMongoDbException.class)
+    protected ResponseEntity<ErrorResponse> handleMongoDBException(UncategorizedMongoDbException e) {
+        final ErrorCode errorCode = ErrorCode.MONGO_QUERY_EXECUTION_ERROR;
+        log.error("MongoDBException", e);
+        final ErrorResponse response = new ErrorResponse(errorCode);
+        return new ResponseEntity<>(response, HttpStatus.valueOf(errorCode.getStatus()));
     }
 
     // 최종 에러처리

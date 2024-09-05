@@ -11,13 +11,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ddokdoghotdog.gowalk.auth.repository.MemberRepository;
+import com.ddokdoghotdog.gowalk.entity.Category;
 import com.ddokdoghotdog.gowalk.entity.Member;
 import com.ddokdoghotdog.gowalk.entity.Product;
 import com.ddokdoghotdog.gowalk.entity.ProductMemberLike;
-import com.ddokdoghotdog.gowalk.entity.ProductMemberLike.ProductMemberLikeId;
+import com.ddokdoghotdog.gowalk.entity.Vendor;
 import com.ddokdoghotdog.gowalk.global.config.s3.S3Service;
 import com.ddokdoghotdog.gowalk.global.exception.BusinessException;
 import com.ddokdoghotdog.gowalk.global.exception.ErrorCode;
+import com.ddokdoghotdog.gowalk.payment.dto.ShopOrderItemDTO;
+import com.ddokdoghotdog.gowalk.payment.dto.ShopOrderRequestDTO;
 import com.ddokdoghotdog.gowalk.product.dto.ShopItemDeleteDTO;
 import com.ddokdoghotdog.gowalk.product.dto.ShopItemRegisterRequestDTO;
 import com.ddokdoghotdog.gowalk.product.dto.ShopItemUpdateRequestDTO;
@@ -97,6 +100,17 @@ public class ProductService {
 			productRepository
 					.save(product.toBuilder().stockQuantity(shopItemUpdateRequestDTO.getStockQuantity()).build());
 		} else {
+			// 카테고리 있는지 여부 확인
+			Long categoryId = shopItemUpdateRequestDTO.getCategory();
+			categoryRepository.findById(categoryId)
+				.orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
+			
+			// 판매업체 실제 있는지 확인
+			Long vendorId = shopItemUpdateRequestDTO.getVendor();
+			vendorRepository.findById(vendorId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.VENDOR_NOT_FOUND));
+			
+			
 			// 상품 정보를 수정하는 경우
 			s3Service.deleteFile(product.getThumbnailImage(), "products");
 			s3Service.deleteFile(product.getDetailImage(), "products");
@@ -104,13 +118,13 @@ public class ProductService {
 			String thumbnailImageURL = s3Service.uploadFile(thumbnail, "products");
 			String detailImageURL = s3Service.uploadFile(detail, "products");
 
-			productRepository.save(Product.builder().categoryId(shopItemUpdateRequestDTO.getCategory()) // 카테고리 ID
+			productRepository.save(product.toBuilder().categoryId(categoryId) // 카테고리 ID
 					.name(shopItemUpdateRequestDTO.getName()) // 상품명
 					.price(shopItemUpdateRequestDTO.getPrice()) // 가격
 					.detailImage(detailImageURL) // 상품 설명 이미지 URL
 					.stockQuantity(shopItemUpdateRequestDTO.getStockQuantity()) // 재고 수량
 					.thumbnailImage(thumbnailImageURL) // 썸네일 이미지 URL
-					.vendorId(shopItemUpdateRequestDTO.getVendor()) // 판매업체 ID
+					.vendorId(vendorId) // 판매업체 ID
 					.visible(true) // 상품 노출 여부
 					.build());
 		}
@@ -196,6 +210,107 @@ public class ProductService {
 				.orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_LIKE_NOT_FOUND));
 		
 		productMemberLikeRepository.deleteLike(product.getId(), member.getId());
+	}
+	
+	
+	// 판매업체 등록
+	public void insertVendor(String vendorName) {
+		Optional<Vendor> vendor = vendorRepository.findByName(vendorName);
+		if(vendor.isPresent()) {
+			// 이미 동일한 이름으로 판매업체를 등록한 경우
+			throw new BusinessException(ErrorCode.ALREADY_VENDOR_REQUEST);
+		}
+		
+		vendorRepository.save(Vendor.builder()
+					.name(vendorName)
+					.build());
+	}
+	
+	// 판매업체명 변경
+	public void updateVendor(String updateVendorName, Long vendorId) {
+		Vendor vendor = vendorRepository.findById(vendorId)
+				.orElseThrow(() -> new BusinessException(ErrorCode.VENDOR_NOT_FOUND));
+		vendorRepository.save(vendor.toBuilder()
+					.name(updateVendorName)
+					.build());
+	}
+	
+	// 판매업체 목록 가져오기
+	public List<Vendor> findVendorAll(){
+		return vendorRepository.findAll();
+	}
+	
+	// 판매업체 삭제
+	public void deleteVendor(Long vendorId) {
+		Vendor vendor = vendorRepository.findById(vendorId)
+				.orElseThrow(() -> new BusinessException(ErrorCode.VENDOR_NOT_FOUND));
+		try {
+			vendorRepository.delete(vendor);			
+		} catch (Exception e) {
+			// 이미 해당 판매업체로 등록된 상품이 있다는 의미
+			throw new BusinessException(ErrorCode.VENDOR_DELETE_ERROR);
+		}
+	}
+	
+	// 카테고리 등록
+	public void insertCategory(String categoryName) {
+		Optional<Category> category = categoryRepository.findByName(categoryName);
+		if(category.isPresent()) {
+			// 이미 동일한 이름으로 카테고리를 등록한 경우
+			throw new BusinessException(ErrorCode.ALREADY_CATEGORY_REQUEST);
+		}
+		
+		categoryRepository.save(Category.builder()
+									.name(categoryName)
+									.build());
+	}
+	
+	// 카테고리명 변경
+	public void updateCategory(String updateCategoryName, Long categoryId) {
+		Category category = categoryRepository.findById(categoryId)
+				.orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
+		categoryRepository.save(category.toBuilder()
+									.name(updateCategoryName)
+									.build());
+	}
+	
+	// 카테고리 목록 가져오기
+	public List<Category> findCategoryAll() {
+		return categoryRepository.findAll();
+	}
+	
+	// 카테고리 삭제
+	public void deleteCategory(Long categoryId) {
+		Category category = categoryRepository.findById(categoryId)
+				.orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
+		try {
+			categoryRepository.delete(category);
+		}catch (Exception e) {
+			// 이미 해당 카테고리로 등록된 상품이 있다는 의미
+			throw new BusinessException(ErrorCode.CATEGORY_DELETE_ERROR);
+		}
+	}
+	
+	// 결제 요청이 온 건에 대한 가격 검증
+	@Transactional
+	public void inspectShopOrderRequestDTO(ShopOrderRequestDTO shopOrderRequestDTO) {
+		Long totalPrice = 0L;
+		List<ShopOrderItemDTO> orderItemList = shopOrderRequestDTO.getOrderItems();
+		for(ShopOrderItemDTO orderItem : orderItemList) {
+			// 주문 요청이 온 상픔이 진짜 있는 지 확인
+			Long productId = orderItem.getProductId();
+			Product product = productRepository.findById(productId)
+					.orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
+			totalPrice += product.getPrice() * orderItem.getQuantity();
+		}
+		
+		// 주문 요청이 들어온 총 가격과 DB상에 저장돼있는 총 가격이 맞는지 확인
+		if(Integer.parseInt(String.valueOf(totalPrice)) != shopOrderRequestDTO.getTotalAmount()) {
+			// 틀리다면 가격에 장난질을 한 것임
+			log.info("가격에 장난질하지 마십쇼!!");
+			throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+		}
+		
 	}
 	
 }
