@@ -9,13 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.ddokdoghotdog.gowalk.entity.Member;
 import com.ddokdoghotdog.gowalk.entity.Order;
 
 @Repository
 public interface OrdersRepository extends JpaRepository<Order, Long>{
 
 	Optional<Order> findByKakaoOrderId(String kakaoOrderId);
+	List<Order> findByMemberId(Long memberId);
 	
 	@Query(value = "SELECT o.address FROM orders o WHERE o.memberid = :memberId "
 			+ "ORDER BY o.orderdat DESC FETCH FIRST 1 ROWS ONLY", nativeQuery = true)

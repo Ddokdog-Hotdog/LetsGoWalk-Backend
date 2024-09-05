@@ -61,7 +61,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                                 .orElseThrow(() -> new IllegalArgumentException("ROLE_USER가 존재하지 않습니다."));
 
                 Member newMember = Member.builder()
-                                .nickname(oAuth2UserInfo.getNickname())
+                                //.nickname(oAuth2UserInfo.getNickname())
                                 .email(oAuth2UserInfo.getEmail())
                                 .socialProvider(oAuth2UserInfo.getProvider())
                                 .profileImageUrl(oAuth2UserInfo.getProfile())

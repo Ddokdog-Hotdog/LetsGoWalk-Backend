@@ -113,26 +113,24 @@ public class QuestService {
 
     @Transactional
     public void rewardPoints(Long memberId, Long questId) {
-        Optional<QuestAchievement> achievementOpt = questAchievementRepository.findByMemberIdAndQuestId(memberId, questId);
+        
+        List<QuestAchievement> achievements = questAchievementRepository.findByMemberIdAndQuestIdAndIsRewardedFalse(memberId, questId);
 
-        if (achievementOpt.isPresent()) {
-            QuestAchievement achievement = achievementOpt.get();
+        for (QuestAchievement achievement : achievements) {
+            Member member = achievement.getMember();
+            Quest quest = achievement.getQuest();
 
-            if (achievement.getRewardDate() == null && !achievement.getIsRewarded()) {
-                
-                Member member = achievement.getMember();
-                Quest quest = achievement.getQuest();
+            member.setPoint(member.getPoint() + quest.getAchievementPoints());
 
-                member.setPoint(member.getPoint() + quest.getAchievementPoints());
+            achievement.setIsRewarded(true);
+            achievement.setRewardDate(new Date(System.currentTimeMillis()));
 
-                achievement.setIsRewarded(true);
-                achievement.setRewardDate(new Date(System.currentTimeMillis()));
-
-                memberRepository.save(member);
-                questAchievementRepository.save(achievement);
-            }
+            memberRepository.save(member);
+            questAchievementRepository.save(achievement);
         }
     }
+    
+    
 
     
     @Scheduled(cron = "0 0 0 * * *")
