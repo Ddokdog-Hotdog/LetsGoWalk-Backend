@@ -19,4 +19,11 @@ public interface QuestAchievementRepository extends JpaRepository<QuestAchieveme
 	List<QuestAchievement> findByMemberId(Long memberId);
 
 	Optional<QuestAchievement> findByMemberIdAndQuestId(Long memberId, Long questId);
+	
+	List<QuestAchievement> findByIsRewardedTrue();
+	
+	List<QuestAchievement> findByIsRewardedTrueAndMemberId(Long memberId);
+
+	List<QuestAchievement> findByMemberIdAndQuestIdAndIsRewardedFalse(Long memberId, Long questId);
+	
 }

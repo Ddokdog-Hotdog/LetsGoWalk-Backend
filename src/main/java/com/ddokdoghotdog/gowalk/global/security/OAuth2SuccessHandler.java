@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final TokenProvider tokenProvider;
     private static final String URL = "/auth/success";
-    private static final String ADDITIONAL_INFO_URL = "/auth/register";
+    private static final String ADDITIONAL_INFO_URL = "http://localhost:3000/auth/register";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,

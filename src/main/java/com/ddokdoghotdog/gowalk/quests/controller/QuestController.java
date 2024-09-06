@@ -36,7 +36,7 @@ public class QuestController {
 
     @PutMapping("")
     @RequiredMemberId
-    public void rewardPoints(Long memberId, @RequestParam(name = "questId") Long questId) {
+    public void rewardPoints(@RequestParam(name = "questId") Long questId, Long memberId) {
     	questService.rewardPoints(memberId, questId);
     }
 }
