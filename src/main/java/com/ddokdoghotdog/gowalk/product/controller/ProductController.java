@@ -142,7 +142,7 @@ public class ProductController {
 	// 판매업체 등록
 	@PostMapping("vendor/insert")
 	public ResponseEntity<?> insertVendor(@RequestParam("vendor") String vendor){
-		productService.insertCategory(vendor);
+		productService.insertVendor(vendor);
 		return ResponseEntity.status(HttpStatus.OK)
 				.body("판매업체 등록 성공");
 	}
