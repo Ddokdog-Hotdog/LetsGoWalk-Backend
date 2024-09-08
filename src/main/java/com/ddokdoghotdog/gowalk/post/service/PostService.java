@@ -126,6 +126,7 @@ public class PostService {
 	                    comment.getParentComment() != null ? comment.getParentComment().getId() : null,
 	                    comment.getMember().getNickname(),
 	                    comment.getContents(),
+	                    comment.getMember().getProfileImageUrl(),
 	                    comment.getCreatedAt(),
 	                    comment.getUpdatedAt()))
 	            .collect(Collectors.toList()) : Collections.emptyList();
