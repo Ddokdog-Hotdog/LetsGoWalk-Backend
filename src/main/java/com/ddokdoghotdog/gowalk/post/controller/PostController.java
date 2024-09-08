@@ -25,6 +25,7 @@ import com.ddokdoghotdog.gowalk.entity.Post;
 import com.ddokdoghotdog.gowalk.post.dto.request.PostDetailDeleteRequestDTO;
 import com.ddokdoghotdog.gowalk.post.dto.request.PostDetailUpdateRequestDTO;
 import com.ddokdoghotdog.gowalk.post.dto.request.PostWriteRequestDTO;
+import com.ddokdoghotdog.gowalk.post.dto.response.BoardGetListResponseDTO;
 import com.ddokdoghotdog.gowalk.post.dto.response.PostGetDetailResponseDTO;
 import com.ddokdoghotdog.gowalk.post.dto.response.PostGetListResponseDTO;
 import com.ddokdoghotdog.gowalk.post.service.PostService;
@@ -50,6 +51,14 @@ public class PostController {
         List<PostGetListResponseDTO> post = postService.getPostList(boardid, pageable);
         return ResponseEntity.ok(post);
     }
+	
+	@GetMapping("/board")
+	public ResponseEntity<List<BoardGetListResponseDTO>> getAllBoard(){
+		List<BoardGetListResponseDTO> lists = postService.getAllBoards().stream()
+				.map(list -> new BoardGetListResponseDTO(list.getId(), list.getName()))
+				.collect(Collectors.toList());
+		return ResponseEntity.ok(lists);
+	}
 	
 
 	@GetMapping("board/{boardid}/{memberid}")
