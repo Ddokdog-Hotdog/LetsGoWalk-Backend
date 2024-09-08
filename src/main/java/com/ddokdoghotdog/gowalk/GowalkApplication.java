@@ -13,7 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAsync
 @SpringBootApplication
 @EnableAspectJAutoProxy
-@EnableScheduling
 public class GowalkApplication {
 
 	public static void main(String[] args) {

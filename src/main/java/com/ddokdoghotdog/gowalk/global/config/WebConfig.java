@@ -15,7 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE","OPTIONS")
                 .allowedHeaders("*") // 모든 헤더를 허용
                 .exposedHeaders("Access")
-                .allowCredentials(true)// 쿠키 인증 요청 허용
+                .allowCredentials(true);// 쿠키 인증 요청 허용
     }
     
 }
