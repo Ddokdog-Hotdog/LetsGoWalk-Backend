@@ -98,8 +98,15 @@ server:
     port: 8080
 custom:
     baseUrl: http://localhost:8080
+    payment:
+        successfulURL: http://localhost:3000/shop/payment/complete
+        cancelURL: http://localhost:3000/shop/payment/error
+        failURL: http://localhost:3000/shop/payment/error
 
 serverName: dev_server
+
+sample:
+  host: http://localhost:8080 # 개발 환경용 카카오페이
 
 ---
 spring:
@@ -133,6 +140,13 @@ spring:
                 enable-logging: false
 custom:
     baseUrl: https://api.ddokdoghotdog.shop
-
+    payment:
+        successfulURL: https://ddokdoghotdog.shop/shop/payment/complete
+        cancelURL: https://ddokdoghotdog.shop/shop/payment/error
+        failURL: https://ddokdoghotdog.shop/shop/payment/error
+    
+sample:
+  host: https://api.ddokdoghotdog.shop
+  
 ---
 

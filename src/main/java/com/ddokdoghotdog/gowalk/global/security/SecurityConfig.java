@@ -43,11 +43,11 @@ public class SecurityConfig {
                                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                                 .authorizeHttpRequests(authorize -> authorize
-                                                .requestMatchers("/auth/success").permitAll()
-                                                .requestMatchers("/auth/register").permitAll()
+                                                .requestMatchers("/auth/success","/auth/register","/mypage").authenticated()  
                                                 .requestMatchers("/error", "/favicon.ico").permitAll()
                                                 .requestMatchers("/", "/hc", "/env").permitAll()
                                                 .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
+                                                .requestMatchers("/api/shop/payments/approve/**", "/api/shop/payments/cancel/**", "/api/shop/payments/fail/**").permitAll()
                                                 // .requestMatchers("api/mypage/pets").hasRole("ADMIN")
                                                 // .anyRequest().authenticated())
                                                 .anyRequest().permitAll())

@@ -74,6 +74,11 @@ public class PostService {
 	            .collect(Collectors.toList());
 	}
 	
+	//게시글 종류 조회
+	public List<Board> getAllBoards(){
+		return boardRepository.findAll();
+	}
+	
 	//내가 작성한 게시글 리스트 조회 
 	@Transactional(readOnly = true)
 	public List<PostGetListResponseDTO> getMyPostList(Long boardid, Long memberid, Pageable pageable) {
@@ -121,6 +126,7 @@ public class PostService {
 	                    comment.getParentComment() != null ? comment.getParentComment().getId() : null,
 	                    comment.getMember().getNickname(),
 	                    comment.getContents(),
+	                    comment.getMember().getProfileImageUrl(),
 	                    comment.getCreatedAt(),
 	                    comment.getUpdatedAt()))
 	            .collect(Collectors.toList()) : Collections.emptyList();

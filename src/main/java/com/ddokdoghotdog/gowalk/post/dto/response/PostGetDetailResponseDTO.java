@@ -41,6 +41,7 @@ public class PostGetDetailResponseDTO {
         private Long commentsId;
         private String nickname;
         private String content;
+        private String profileImg;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
 

@@ -89,6 +89,7 @@ public class MemberController {
     public ResponseEntity<MypageDTO> getMyPage(Long memberId) {
         MypageDTO myPageDTO = memberService.getMyPageInfo(memberId);
         if (myPageDTO == null) {
+        	System.out.println("1");
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(myPageDTO);
