@@ -38,7 +38,7 @@ public class RequiredMemberIdAspect {
 					} catch (NumberFormatException e) {
 						// 테스트 용 => 지금 로그인 중이 아닐때 넣는 값 (실제 배포 시 지워야함)
 						//args[i] = this.defaultId;
-						//log.info("Failed to parse memberId: " + name);
+						log.info("Failed to parse memberId: " + name);
 					}
 				} else {
 					
