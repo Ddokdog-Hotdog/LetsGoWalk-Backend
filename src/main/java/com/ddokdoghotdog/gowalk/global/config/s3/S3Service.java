@@ -15,7 +15,6 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
 
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,7 +33,7 @@ public class S3Service {
 
     @Transactional
     public String uploadFile(MultipartFile uploadFile, String folder) throws AmazonS3Exception {
-        if(!folder.equals("products") && !folder.equals("member") && !folder.equals("posts"))
+        if(!folder.equals("products") && !folder.equals("member") && !folder.equals("posts") && !folder.equals("pets"))
             throw new AmazonS3Exception("이미지 링크 오류");
 
         String origName = uploadFile.getOriginalFilename();
