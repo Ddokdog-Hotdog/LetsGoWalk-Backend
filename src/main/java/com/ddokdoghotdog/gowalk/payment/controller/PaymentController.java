@@ -1,9 +1,7 @@
 package com.ddokdoghotdog.gowalk.payment.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ddokdoghotdog.gowalk.global.annotation.RequiredMemberId;
-import com.ddokdoghotdog.gowalk.payment.dto.ShopOrderItemDTO;
 import com.ddokdoghotdog.gowalk.payment.dto.ShopOrderRequestDTO;
 import com.ddokdoghotdog.gowalk.payment.dto.ShopReadyResponseDTO;
 import com.ddokdoghotdog.gowalk.payment.dto.ShopRefundRequestDTO;
@@ -32,13 +29,23 @@ public class PaymentController {
 	@Autowired
 	private KakaoPayService kakaoPayService;
 	
+	@Value("${custom.payment.successfulURL}")
+	private String successfulURL;
+	
+	@Value("${custom.payment.cancelURL}")
+	private String cancelURL;
+	
+	@Value("${custom.payment.failURL}")
+	private String failURL;
+	
+	@ResponseBody
 	@RequiredMemberId
-	@GetMapping("/ready/{agent}/{openType}")
-    public String ready(@PathVariable("agent") String agent, @PathVariable("openType") String openType,
-    					@RequestBody(required = false) ShopOrderRequestDTO shopOrderRequestDTO, Long memberId) {
+	@PostMapping("/ready/{agent}/{openType}")
+    public ResponseEntity<?> ready(@PathVariable("agent") String agent, @PathVariable("openType") String openType,
+    					@RequestBody ShopOrderRequestDTO shopOrderRequestDTO, Long memberId) {
 		
 		// 테스트용 - 시작
-		List<ShopOrderItemDTO> orderItems = new ArrayList<>();
+//		List<ShopOrderItemDTO> orderItems = new ArrayList<>();
 		
 		// 장바구니에 담지 않는 단건 결제 테스트용
 //		orderItems.add(ShopOrderItemDTO.builder()
@@ -49,12 +56,12 @@ public class PaymentController {
 //						.build());
 		
 		// 장바구니에 담는 단건 결제 테스트용
-		orderItems.add(ShopOrderItemDTO.builder()
-				.cartItemId(24L) 
-				.productId(4L)
-				.productName("Sample Product4")
-				.quantity(1L)
-				.build());
+//		orderItems.add(ShopOrderItemDTO.builder()
+//				.cartItemId(24L) 
+//				.productId(4L)
+//				.productName("Sample Product4")
+//				.quantity(1L)
+//				.build());
 		
 		// 장바구니에 담는 여러건 결제 테스트용
 //		orderItems.add(ShopOrderItemDTO.builder()
@@ -70,49 +77,50 @@ public class PaymentController {
 //				.quantity(1L)
 //				.build());
 		
-		ShopOrderRequestDTO testRequest = ShopOrderRequestDTO.builder()
-							.orderItems(orderItems)
-							.totalAmount(10000)
-							.address("서울")
-							.point(0L)
-							.build();
-		ShopReadyResponseDTO readyResponse = kakaoPayService.ready(agent, openType, testRequest, memberId);
+//		ShopOrderRequestDTO testRequest = ShopOrderRequestDTO.builder()
+//							.orderItems(orderItems)
+//							.totalAmount(10000)
+//							.address("서울")
+//							.point(0L)
+//							.build();
+//		ShopReadyResponseDTO readyResponse = kakaoPayService.ready(agent, openType, testRequest, memberId);
 		// 테스트 용 - 끝
 		
 		// 실제 배포 시 아래 코드 주석 해제
-//		ShopReadyResponseDTO readyResponse = kakaoPayService.ready(agent, openType, shopOrderRequestDTO, memberId);
+		ShopReadyResponseDTO readyResponse = kakaoPayService.ready(agent, openType, shopOrderRequestDTO, memberId);
         if (agent.equals("mobile")) {
             // 모바일은 결제대기 화면으로 redirect 한다.
             // In mobile, redirect to payment stand-by screen
-            return "redirect:" + readyResponse.getNext_redirect_mobile_url();
+            return ResponseEntity.status(HttpStatus.OK)
+					.body(readyResponse.getNext_redirect_mobile_url());
         }
         // pc
         //model.addAttribute("response", readyResponse);
-        return "redirect:" + readyResponse.getNext_redirect_pc_url();
+        return ResponseEntity.status(HttpStatus.OK)
+				.body(readyResponse.getNext_redirect_pc_url());
     }
 
-	@ResponseBody
+
     @GetMapping("/approve/{agent}/{openType}")
-    public ResponseEntity<?> approve(@PathVariable("agent") String agent, @PathVariable("openType") String openType, @RequestParam("pg_token") String pgToken) {
+    public String approve(@PathVariable("agent") String agent, @PathVariable("openType") String openType, @RequestParam("pg_token") String pgToken) {
         System.out.println("approve 호출, pgToken값 : " + pgToken);
     	String successRedirectURL = kakaoPayService.approve(pgToken);
     	log.info("승인 후 리다이렉트 할 url : {}", successRedirectURL);
-        return ResponseEntity.status(HttpStatus.OK)
-        					.body(successRedirectURL);
+        return "redirect:" + this.successfulURL;
     }
 
-	@ResponseBody
+
     @GetMapping("/cancel/{agent}/{openType}")
-    public void cancel(@PathVariable("agent") String agent, @PathVariable("openType") String openType) {
+    public String cancel(@PathVariable("agent") String agent, @PathVariable("openType") String openType) {
 		log.info("결제가 취소되었습니다!!");
-		kakaoPayService.cancelAndFail();
+		return "redirect:" + this.cancelURL;
     }
 
-	@ResponseBody
+	
     @GetMapping("/fail/{agent}/{openType}")
-    public void fail(@PathVariable("agent") String agent, @PathVariable("openType") String openType) {
+    public String fail(@PathVariable("agent") String agent, @PathVariable("openType") String openType) {
 		log.info("결제가 실패되었습니다!!");
-		kakaoPayService.cancelAndFail();
+		return "redirect:" + this.failURL;
     }
 	
 	@RequiredMemberId

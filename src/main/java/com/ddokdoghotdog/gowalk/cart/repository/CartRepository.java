@@ -19,6 +19,7 @@ public interface CartRepository extends JpaRepository<CartItem, Long>{
 			+ "    p.id,\r\n"
 			+ "    p.name,\r\n"
 			+ "    p.price,\r\n"
+			+ "    ci.id AS cartid, \r\n"
 			+ "    p.thumbnailimage,\r\n"
 			+ "    ci.quantity,\r\n"
 			+ "    c.name AS category,\r\n"
