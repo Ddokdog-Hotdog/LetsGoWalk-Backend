@@ -9,6 +9,9 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import com.ddokdoghotdog.gowalk.global.jwt.TokenAuthenticationFilter;
 import com.ddokdoghotdog.gowalk.global.jwt.TokenExceptionFilter;
@@ -40,8 +43,7 @@ public class SecurityConfig {
                                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                                 .authorizeHttpRequests(authorize -> authorize
-                                                .requestMatchers("/auth/success").permitAll()
-                                                .requestMatchers("/auth/register").permitAll()
+                                                .requestMatchers("/auth/success","/auth/register","/mypage").authenticated()  
                                                 .requestMatchers("/error", "/favicon.ico").permitAll()
                                                 .requestMatchers("/", "/hc", "/env").permitAll()
                                                 .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
@@ -64,5 +66,17 @@ public class SecurityConfig {
                                                 .accessDeniedHandler(new CustomAccessDeniedHandler()));
 
                 return http.build();
+        }
+        
+        @Bean
+        public CorsFilter corsFilter() {
+            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+            CorsConfiguration config = new CorsConfiguration();
+            config.setAllowCredentials(true);
+            config.addAllowedOrigin("http://localhost:3000"); // Vue.js 클라이언트 주소
+            config.addAllowedHeader("*");
+            config.addAllowedMethod("*");
+            source.registerCorsConfiguration("/**", config);
+            return new CorsFilter(source);
         }
 }

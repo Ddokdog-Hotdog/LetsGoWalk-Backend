@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final TokenProvider tokenProvider;
-    private static final String URL = "/auth/success";
+    private static final String URL = "http://localhost:3000/auth/success";
     private static final String ADDITIONAL_INFO_URL = "http://localhost:3000/auth/register";
 
     @Override
@@ -35,7 +35,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Member member = principal.getMember();
         String redirectUrl;
-        if ((member.getDateOfBirth()!=null)&&(member.getGender()!=null)) {
+        if ((member.getDateOfBirth()!=null)&&(member.getGender()!=null)&&(member.getNickname()!=null)&&(member.getPhoneNumber()!=null)) {
             // 추가 정보가 있는 경우
             redirectUrl = UriComponentsBuilder.fromUriString(URL)
                     .queryParam("accessToken", accessToken)

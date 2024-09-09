@@ -5,9 +5,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ddokdoghotdog.gowalk.auth.repository.MemberRepository;
 import com.ddokdoghotdog.gowalk.entity.Member;
+import com.ddokdoghotdog.gowalk.global.config.s3.S3Service;
 import com.ddokdoghotdog.gowalk.global.exception.BusinessException;
 import com.ddokdoghotdog.gowalk.global.exception.ErrorCode;
 import com.ddokdoghotdog.gowalk.member.dto.MemberDTO;
@@ -25,6 +27,8 @@ public class MemberService {
 	private final MemberRepository memberRepository;
     @Autowired
     private final PetRepository petRepository;
+    @Autowired
+	private S3Service s3Service;
 
     public Member getMemberById(Long id) {
         return memberRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
@@ -45,12 +49,17 @@ public class MemberService {
     	return memberInfo;
     }
     
-    public MemberDTO updateMemberInfo(Long memberId, MemberUpdateDTO updateDTO) {
+    public MemberDTO updateMemberInfo(Long memberId, MemberUpdateDTO updateDTO, MultipartFile profileImage) {
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
         System.out.println("4");
+        
+        if (profileImage != null && !profileImage.isEmpty()) {
+            String profileImageUrl = s3Service.uploadFile(profileImage, "member");
+            member.setProfileImageUrl(profileImageUrl);
+        }
+       
         member.setNickname(updateDTO.getNickname());
-        member.setProfileImageUrl(updateDTO.getProfileImageUrl());
         member.setDateOfBirth(updateDTO.getDateOfBirth());
         member.setGender(updateDTO.getGender());
         member.setPhoneNumber(updateDTO.getPhoneNumber());
@@ -95,4 +104,13 @@ public class MemberService {
     	        .pets(petInfoList)
     	        .build();
     }
+
+	public boolean isNicknameTaken(String nickname) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean checkNicknameDuplicate(String nickname, Long memberId) {
+		return memberRepository.existsByNicknameAndIdNot(nickname, memberId);
+	}
 }
