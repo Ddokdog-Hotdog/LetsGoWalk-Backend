@@ -43,15 +43,20 @@ public class SecurityConfig {
                                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                                 .authorizeHttpRequests(authorize -> authorize
-                                                .requestMatchers("/auth/success","/auth/register","/mypage").authenticated()  
+                                                .requestMatchers("/auth/success", "/auth/register", "/mypage")
+                                                .authenticated()
                                                 .requestMatchers("/error", "/favicon.ico").permitAll()
                                                 .requestMatchers("/", "/hc", "/env").permitAll()
-                                                .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
-                                                .requestMatchers("/api/shop/payments/approve/**", "/api/shop/payments/cancel/**", "/api/shop/payments/fail/**").permitAll()
+                                                .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**",
+                                                                "/api-docs", "/api-docs/**", "/v3/api-docs/**")
+                                                .permitAll()
+                                                .requestMatchers("/api/shop/payments/approve/**",
+                                                                "/api/shop/payments/cancel/**",
+                                                                "/api/shop/payments/fail/**")
+                                                .permitAll()
                                                 // .requestMatchers("api/mypage/pets").hasRole("ADMIN")
                                                 // .anyRequest().authenticated())
                                                 .anyRequest().permitAll())
-
 
                                 .oauth2Login(oauth -> oauth.userInfoEndpoint(c -> c.userService(oAuth2UserService))
                                                 .successHandler(oAuth2SuccessHandler)
@@ -67,16 +72,17 @@ public class SecurityConfig {
 
                 return http.build();
         }
-        
-        @Bean
-        public CorsFilter corsFilter() {
-            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-            CorsConfiguration config = new CorsConfiguration();
-            config.setAllowCredentials(true);
-            config.addAllowedOrigin("http://localhost:3000"); // Vue.js 클라이언트 주소
-            config.addAllowedHeader("*");
-            config.addAllowedMethod("*");
-            source.registerCorsConfiguration("/**", config);
-            return new CorsFilter(source);
-        }
+
+        // @Bean
+        // public CorsFilter corsFilter() {
+        // UrlBasedCorsConfigurationSource source = new
+        // UrlBasedCorsConfigurationSource();
+        // CorsConfiguration config = new CorsConfiguration();
+        // config.setAllowCredentials(true);
+        // config.addAllowedOriginPattern("/*"); // Vue.js 클라이언트 주소
+        // config.addAllowedHeader("*");
+        // config.addAllowedMethod("*");
+        // source.registerCorsConfiguration("/**", config);
+        // return new CorsFilter(source);
+        // }
 }
