@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ddokdoghotdog.gowalk.auth.MemberRepository;
+import com.ddokdoghotdog.gowalk.auth.repository.MemberRepository;
+import com.ddokdoghotdog.gowalk.global.jwt.TokenProvider;
 import com.ddokdoghotdog.gowalk.global.jwt.TokenService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,9 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 
     private final TokenService tokenService;
-    // 테스트용 나중에 서비스만들어서 사용해주세요.
     private final MemberRepository memberRepository;
+    private final TokenProvider tokenProvider;
+  
 
     @GetMapping("/success")
     public ResponseEntity<String> loginSuccess(@RequestParam("accessToken") String accessToken) {
@@ -32,14 +34,6 @@ public class AuthController {
     public ResponseEntity<Void> logout(@AuthenticationPrincipal UserDetails userDetails) {
         tokenService.deleteRefreshToken(userDetails.getUsername());
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/info")
-    public String myInfoTest() {
-
-        // memberRepository.findByEmailAndSocialProvider(email, provider)
-
-        return new String("asd");
     }
 
 }
