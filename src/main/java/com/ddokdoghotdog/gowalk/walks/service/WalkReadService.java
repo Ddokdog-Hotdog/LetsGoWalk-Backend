@@ -70,14 +70,11 @@ public class WalkReadService {
         public List<WalkPaths> getNearbyWalkPaths(WalkSummaryDTO.NearbyWalkPathsRequest pointDTO) {
 
                 // 주변 1km 탐색
-                int maxDistance = 10000;
+                int maxDistance = 1000;
                 Pageable limit = PageRequest.of(0, 100);
-                Timestamp nowDate = new Timestamp(System.currentTimeMillis());
-                Timestamp fromDate = new Timestamp(System.currentTimeMillis() + 30 * 24 * 60 * 60 * 1000); // 30일 전
+                Timestamp fromDate = new Timestamp(System.currentTimeMillis() - (30 * 24 * 60 * 60 * 1000L)); // 30일 전
 
-                System.out.println("현재일자: " + nowDate);
-                System.out.println("시작일자: " + fromDate);
                 GeoJsonPoint location = new GeoJsonPoint(pointDTO.getLongitude(), pointDTO.getLatitude());
-                return walkPathRepository.findByLocationNear(location, maxDistance, fromDate);
+                return walkPathRepository.findByLocationNear(location, maxDistance, fromDate, limit);
         }
 }
