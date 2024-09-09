@@ -109,10 +109,12 @@ public class PostService {
 		}
 	
 	@Transactional(readOnly = true)
-	public PostGetDetailResponseDTO getPostDetails(Long postid) {
+	public PostGetDetailResponseDTO getPostDetails(Long postid, Long memberId) {
 	    // 게시글 조회
 	    Post post = postRepository.findById(postid)
 	            .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+	    
+	    boolean isLiked = postLikeRepository.existsByPostIdAndMemberId(postid, memberId);
 
 	    // 게시글의 미디어 URL 리스트
 	    List<String> imageUrl = post.getMediaUrls() != null ? post.getMediaUrls().stream()
