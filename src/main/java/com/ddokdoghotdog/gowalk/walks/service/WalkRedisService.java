@@ -3,7 +3,7 @@ package com.ddokdoghotdog.gowalk.walks.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
+import java.util.Set;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -84,5 +84,9 @@ public class WalkRedisService {
         String key = walkBaseKey(walkId);
         String distanceStr = (String) redisTemplate.opsForHash().get(key, DISTANCE_KEY);
         return distanceStr != null ? Double.valueOf(distanceStr) : null;
+    }
+
+    public Set<String> getAllActiveWalkIds() {
+        return redisTemplate.keys(WALK_KEY + ":*:" + ROUTE_KEY);
     }
 }

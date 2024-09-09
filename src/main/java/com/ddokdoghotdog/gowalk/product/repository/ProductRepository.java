@@ -136,11 +136,12 @@ public interface ProductRepository extends JpaRepository<Product, Long>{
 	        + ")\n"
 	        + "SELECT\n"
 	        + "    p.id AS productId,\n"
-	        + "    p.name AS productName,\n"
-	        + "    p.price,\n"
+	        + "    p.name AS name,\n"
+	        + "    p.price AS price,\n"
 	        + "    p.thumbnailimage,\n"
-	        + "    p.categoryid AS productCategory,\n"
-	        + "    v.name AS vendorName,\n"
+	        + "    p.stock_quantity AS stockQuantity,\r\n"
+	        + "    p.categoryid AS category,\n"
+	        + "    v.name AS vendor,\n"
 	        + "    CASE\n"
 	        + "        WHEN pl.memberid IS NOT NULL THEN 'Y' \n"
 	        + "        ELSE 'N'\n"
@@ -159,4 +160,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>{
 	@Modifying
 	@Query(value = "UPDATE products SET visible = :visible WHERE id = :id", nativeQuery = true)
 	void updateVisible(@Param("visible") int visible , @Param("id") Long id);
+
+
+	Optional<Product> findByName(@Param("name") String name);
 }

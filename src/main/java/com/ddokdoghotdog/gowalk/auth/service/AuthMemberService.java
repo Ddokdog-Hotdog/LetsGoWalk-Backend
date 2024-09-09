@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class MemberService {
+public class AuthMemberService {
     private final MemberRepository memberRepository;
 
     public Member getMemberById(Long id) {

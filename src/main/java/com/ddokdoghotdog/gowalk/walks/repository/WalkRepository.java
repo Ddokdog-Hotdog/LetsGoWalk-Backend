@@ -34,7 +34,8 @@ public interface WalkRepository extends JpaRepository<Walk, Long> {
                         "LEFT JOIN FETCH m.role " +
                         "WHERE m.id = :memberId " +
                         "AND YEAR(w.startTime) = :year " +
-                        "AND MONTH(w.startTime) = :month")
+                        "AND MONTH(w.startTime) = :month " +
+                        "AND w.endTime IS NOT NULL")
         List<Walk> findAllByPetOwnerMemberIdAndMonth(@Param("memberId") Long memberId,
                         @Param("year") int year,
                         @Param("month") int month);;
@@ -48,10 +49,13 @@ public interface WalkRepository extends JpaRepository<Walk, Long> {
                         "WHERE m.id = :memberId " +
                         "AND YEAR(w.startTime) = :year " +
                         "AND MONTH(w.startTime) = :month " +
-                        "AND DAY(w.startTime) = :day")
+                        "AND DAY(w.startTime) = :day " +
+                        "AND w.endTime IS NOT NULL")
         List<Walk> findAllByPetOwnerMemberIdAndDay(@Param("memberId") Long memberId,
                         @Param("year") int year,
                         @Param("month") int month,
                         @Param("day") int day);
 
+        @Query("SELECT w.id FROM Walk w WHERE w.endTime IS NULL")
+        List<Long> findAllUnfinishedWalkIds();
 }

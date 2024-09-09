@@ -1,6 +1,6 @@
 package com.ddokdoghotdog.gowalk.entity;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 import com.ddokdoghotdog.gowalk.global.entity.BaseTimeEntity;
@@ -44,7 +44,7 @@ public class Member extends BaseTimeEntity {
     @Column(name = "email", nullable = false, length = 50)
     private String email;
 
-    @Column(name = "nickname", nullable = false, length = 20)
+    @Column(name = "nickname", length = 20)
     private String nickname;
 
     @Column(name = "memberkey", nullable = false)
@@ -64,6 +64,9 @@ public class Member extends BaseTimeEntity {
 
     @Column(name = "point", nullable = false)
     private Long point;
+    
+    @Column(name = "phoneNumber",unique = true, length = 50)
+    private String phoneNumber;
     
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Pet> pets;

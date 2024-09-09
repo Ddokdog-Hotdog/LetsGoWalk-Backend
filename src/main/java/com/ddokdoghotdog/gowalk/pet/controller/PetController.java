@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ddokdoghotdog.gowalk.auth.service.MemberService;
 import com.ddokdoghotdog.gowalk.entity.Breed;
 import com.ddokdoghotdog.gowalk.global.annotation.RequiredMemberId;
+import com.ddokdoghotdog.gowalk.member.service.MemberService;
 import com.ddokdoghotdog.gowalk.pet.Service.PetReadService;
 import com.ddokdoghotdog.gowalk.pet.Service.PetWriteService;
 import com.ddokdoghotdog.gowalk.pet.dto.PetDTO;

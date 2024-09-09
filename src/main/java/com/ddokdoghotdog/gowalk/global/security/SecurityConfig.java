@@ -9,6 +9,9 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import com.ddokdoghotdog.gowalk.global.jwt.TokenAuthenticationFilter;
 import com.ddokdoghotdog.gowalk.global.jwt.TokenExceptionFilter;
@@ -31,7 +34,7 @@ public class SecurityConfig {
                                 .csrf(AbstractHttpConfigurer::disable) // csrf 비활성화 -> cookie를 사용하지 않으면 꺼도 된다. (cookie를
                                                                        // 사용할 경우
                                                                        // httpOnly(XSS 방어), sameSite(CSRF 방어)로 방어해야 한다.)
-                                .cors(AbstractHttpConfigurer::disable) // cors 비활성화 -> 프론트와 연결 시 따로 설정 필요
+                                .cors().and() // cors 비활성화 -> 프론트와 연결 시 따로 설정 필요
                                 .httpBasic(AbstractHttpConfigurer::disable) // 기본 인증 로그인 비활성화
                                 .formLogin(AbstractHttpConfigurer::disable) // 기본 login form 비활성화
                                 .logout(AbstractHttpConfigurer::disable) // 기본 logout 비활성화
@@ -40,14 +43,21 @@ public class SecurityConfig {
                                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                                 .authorizeHttpRequests(authorize -> authorize
-                                                .requestMatchers("/auth/success").permitAll()
+                                                .requestMatchers("/auth/success", "/auth/register", "/mypage")
+                                                .authenticated()
+                                                .requestMatchers("login/**").permitAll()
                                                 .requestMatchers("/error", "/favicon.ico").permitAll()
                                                 .requestMatchers("/", "/hc", "/env").permitAll()
-                                                .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
+                                                .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**",
+                                                                "/api-docs", "/api-docs/**", "/v3/api-docs/**")
+                                                .permitAll()
+                                                .requestMatchers("/api/shop/payments/approve/**",
+                                                                "/api/shop/payments/cancel/**",
+                                                                "/api/shop/payments/fail/**")
+                                                .permitAll()
                                                 // .requestMatchers("api/mypage/pets").hasRole("ADMIN")
-                                                // .anyRequest().authenticated())
-                                                .anyRequest().permitAll())
-
+                                                .anyRequest().authenticated())
+                                // .anyRequest().permitAll())
 
                                 .oauth2Login(oauth -> oauth.userInfoEndpoint(c -> c.userService(oAuth2UserService))
                                                 .successHandler(oAuth2SuccessHandler)
@@ -63,4 +73,17 @@ public class SecurityConfig {
 
                 return http.build();
         }
+
+        // @Bean
+        // public CorsFilter corsFilter() {
+        // UrlBasedCorsConfigurationSource source = new
+        // UrlBasedCorsConfigurationSource();
+        // CorsConfiguration config = new CorsConfiguration();
+        // config.setAllowCredentials(true);
+        // config.addAllowedOriginPattern("/*"); // Vue.js 클라이언트 주소
+        // config.addAllowedHeader("*");
+        // config.addAllowedMethod("*");
+        // source.registerCorsConfiguration("/**", config);
+        // return new CorsFilter(source);
+        // }
 }

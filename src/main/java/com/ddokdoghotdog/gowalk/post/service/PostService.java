@@ -74,6 +74,40 @@ public class PostService {
 	            .collect(Collectors.toList());
 	}
 	
+	//게시글 종류 조회
+	public List<Board> getAllBoards(){
+		return boardRepository.findAll();
+	}
+	
+	//내가 작성한 게시글 리스트 조회 
+	@Transactional(readOnly = true)
+	public List<PostGetListResponseDTO> getMyPostList(Long boardid, Long memberid, Pageable pageable) {
+		Page<Post> posts = postRepository.findByBoardIdAndMemberId(boardid, memberid, pageable);
+		
+		 return posts.stream()
+		            .map(post -> {
+		                // 댓글 수 계산
+		                long commentsCount = post.getComments() != null ? post.getComments().size() : 0L;
+
+		                // 좋아요 수 계산
+		                long likesCount = postLikeRepository.countByPostId(post.getId());
+
+		                return PostGetListResponseDTO.builder()
+		                        .postid(post.getId())
+		                        .boardid(post.getBoard().getId())
+		                        .title(post.getTitle())
+		                        .nickname(post.getMember().getNickname())
+		                        .createdAt(post.getCreatedAt())
+		                        .updatedAt(post.getUpdatedAt())
+		                        .likesCount(likesCount)
+		                        .commentsCount(commentsCount)
+		                        .img(post.getMediaUrls().isEmpty() ? null : post.getMediaUrls().get(0).getMediaUrl()) // 첫 번째 이미지를 대표 이미지로 사용
+		                        .build();
+		            })
+		            .collect(Collectors.toList());
+		
+		}
+	
 	@Transactional(readOnly = true)
 	public PostGetDetailResponseDTO getPostDetails(Long postid) {
 	    // 게시글 조회
@@ -92,6 +126,7 @@ public class PostService {
 	                    comment.getParentComment() != null ? comment.getParentComment().getId() : null,
 	                    comment.getMember().getNickname(),
 	                    comment.getContents(),
+	                    comment.getMember().getProfileImageUrl(),
 	                    comment.getCreatedAt(),
 	                    comment.getUpdatedAt()))
 	            .collect(Collectors.toList()) : Collections.emptyList();

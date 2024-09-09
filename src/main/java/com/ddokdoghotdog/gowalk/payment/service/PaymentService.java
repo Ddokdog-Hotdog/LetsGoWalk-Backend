@@ -173,7 +173,7 @@ public class PaymentService {
 				// 장바구니에 담은 후 단건결제인 경우
 				CartItem cart = cartRepository.findById(orderItem.getCartItemId())
 						.orElseThrow(() -> new BusinessException(ErrorCode.CARTITEM_NOT_FOUND));
-//				cartRepository.delete(cart);
+				cartRepository.delete(cart);
 				log.info("장바구니를 거치는 단건 결제");
 			}
 		}else {
@@ -182,7 +182,7 @@ public class PaymentService {
 				
 				CartItem cart = cartRepository.findById(cartItem.getCartItemId())
 						.orElseThrow(() -> new BusinessException(ErrorCode.CARTITEM_NOT_FOUND));
-//				cartRepository.delete(cart);
+				cartRepository.delete(cart);
 			}
 			log.info("장바구니를 거치는 여러 건 결제");
 		}
