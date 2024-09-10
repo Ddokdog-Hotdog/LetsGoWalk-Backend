@@ -44,7 +44,7 @@ public class SecurityConfig {
 
                                 .authorizeHttpRequests(authorize -> authorize
                                                 .requestMatchers("/auth/success", "/auth/register", "/mypage")
-                                                .authenticated()
+                                                .permitAll()
                                                 .requestMatchers("login/**").permitAll()
                                                 .requestMatchers("/error", "/favicon.ico").permitAll()
                                                 .requestMatchers("/", "/hc", "/env").permitAll()
