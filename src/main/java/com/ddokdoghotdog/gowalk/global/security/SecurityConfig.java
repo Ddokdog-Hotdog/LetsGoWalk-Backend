@@ -9,9 +9,6 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import com.ddokdoghotdog.gowalk.global.jwt.TokenAuthenticationFilter;
 import com.ddokdoghotdog.gowalk.global.jwt.TokenExceptionFilter;
@@ -37,17 +34,16 @@ public class SecurityConfig {
                                 .cors(AbstractHttpConfigurer::disable) // cors 비활성화 -> 프론트와 연결 시 따로 설정 필요
                                 .httpBasic(AbstractHttpConfigurer::disable) // 기본 인증 로그인 비활성화
                                 .formLogin(AbstractHttpConfigurer::disable) // 기본 login form 비활성화
-                                .logout(AbstractHttpConfigurer::disable) // 기본 logout 비활성화
+                                .logout(AbstractHttpConfigurer::disable) // 기본 logout 비활성화s
                                 .headers(c -> c.frameOptions(
                                                 FrameOptionsConfig::disable).disable()) // X-Frame-Options 비활성화
                                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                                 .authorizeHttpRequests(authorize -> authorize
-                                                .requestMatchers("/auth/success","/auth/register","/mypage").authenticated()  
+                                                .requestMatchers("/auth/success","/auth/register","/mypage").authenticated()
                                                 .requestMatchers("/error", "/favicon.ico").permitAll()
                                                 .requestMatchers("/", "/hc", "/env").permitAll()
                                                 .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
-                                                .requestMatchers("/api/shop/payments/approve/**", "/api/shop/payments/cancel/**", "/api/shop/payments/fail/**").permitAll()
                                                 // .requestMatchers("api/mypage/pets").hasRole("ADMIN")
                                                 // .anyRequest().authenticated())
                                                 .anyRequest().permitAll())
@@ -68,15 +64,4 @@ public class SecurityConfig {
                 return http.build();
         }
         
-        @Bean
-        public CorsFilter corsFilter() {
-            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-            CorsConfiguration config = new CorsConfiguration();
-            config.setAllowCredentials(true);
-            config.addAllowedOrigin("http://localhost:3000"); // Vue.js 클라이언트 주소
-            config.addAllowedHeader("*");
-            config.addAllowedMethod("*");
-            source.registerCorsConfiguration("/**", config);
-            return new CorsFilter(source);
-        }
 }

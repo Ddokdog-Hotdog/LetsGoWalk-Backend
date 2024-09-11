@@ -87,6 +87,9 @@ public class MemberController {
     @RequiredMemberId
     @GetMapping("/mypage")
     public ResponseEntity<MypageDTO> getMyPage(Long memberId) {
+    	if (memberId == null) {
+            throw new IllegalArgumentException("Member ID must not be null");
+        }
         MypageDTO myPageDTO = memberService.getMyPageInfo(memberId);
         if (myPageDTO == null) {
         	System.out.println("1");
