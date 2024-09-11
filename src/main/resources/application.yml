@@ -27,11 +27,11 @@ spring:
             hibernate:
     # rabbitMQ(Notification )
     rabbitmq:
-      host: localhost
-      port: 5672
-      username: 
-      password: 
-      
+        host: localhost
+        port: 5672
+        username:
+        password:
+
     data:
         redis:
             host:
@@ -98,6 +98,7 @@ server:
     port: 8080
 custom:
     baseUrl: http://localhost:8080
+    frontUrl: http://localhost:3000
     payment:
         successfulURL: http://localhost:3000/shop/payment/complete
         cancelURL: http://localhost:3000/shop/payment/error
@@ -106,7 +107,7 @@ custom:
 serverName: dev_server
 
 sample:
-  host: http://localhost:8080 # 개발 환경용 카카오페이
+    host: http://localhost:8080 # 개발 환경용 카카오페이
 
 ---
 spring:
@@ -140,13 +141,14 @@ spring:
                 enable-logging: false
 custom:
     baseUrl: https://api.ddokdoghotdog.shop
+    frontUrl: https://api.ddokdoghotdog.shop
     payment:
         successfulURL: https://ddokdoghotdog.shop/shop/payment/complete
         cancelURL: https://ddokdoghotdog.shop/shop/payment/error
         failURL: https://ddokdoghotdog.shop/shop/payment/error
-    
+
 sample:
-  host: https://api.ddokdoghotdog.shop
-  
+    host: https://api.ddokdoghotdog.shop
+
 ---
 
