@@ -68,6 +68,8 @@ dependencies {
 	//rabbitmq
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 
+	//spatial
+	implementation 'org.hibernate:hibernate-spatial:6.2.31.Final'
 }
 
 tasks.named('test') {

@@ -25,56 +25,57 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @Service
 public class WalkReadService {
-        private final WalkPathsRepository walkPathRepository;
-        private final WalkRepository walkRepository;
+    private final WalkPathsRepository walkPathRepository;
+    private final WalkRepository walkRepository;
 
-        public Walk getWalkById(Long walkId) {
-                return walkRepository.findWalkWithPetsById(walkId)
-                                .orElseThrow(() -> new BusinessException(ErrorCode.WALK_NOT_FOUND));
-        }
+    public Walk getWalkById(Long walkId) {
+        return walkRepository.findWalkWithPetsById(walkId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.WALK_NOT_FOUND));
+    }
 
-        public Walk getWalkByIdAndMemberId(Long walkId, Long memberId) {
-                return walkRepository.findByIdAndMemberId(walkId, memberId)
-                                .orElseThrow(() -> new BusinessException(ErrorCode.WALK_NOT_FOUND));
-        }
+    public Walk getWalkByIdAndMemberId(Long walkId, Long memberId) {
+        return walkRepository.findByIdAndMemberId(walkId, memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.WALK_NOT_FOUND));
+    }
 
-        public DailyWalkSummaryResponse getDailyWalk(WalkSummaryDTO.DailyWalkSummaryRequest DailyRequestDTO) {
-                List<Walk> walks = walkRepository.findAllByPetOwnerMemberIdAndDay(DailyRequestDTO.getMemberId(),
-                                DailyRequestDTO.getYear(), DailyRequestDTO.getMonth(), DailyRequestDTO.getDay());
-                List<Long> walkIds = walks.stream()
-                                .map(Walk::getId)
-                                .collect(Collectors.toList());
-                List<WalkPaths> walkPathsList = walkPathRepository.findAllByWalkIdIn(walkIds);
+    public DailyWalkSummaryResponse getDailyWalk(WalkSummaryDTO.DailyWalkSummaryRequest DailyRequestDTO) {
+        List<Walk> walks = walkRepository.findAllByPetOwnerMemberIdAndDay(DailyRequestDTO.getMemberId(),
+                DailyRequestDTO.getYear(), DailyRequestDTO.getMonth(), DailyRequestDTO.getDay());
+        List<Long> walkIds = walks.stream()
+                .map(Walk::getId)
+                .collect(Collectors.toList());
+        List<WalkPaths> walkPathsList = walkPathRepository.findAllByWalkIdIn(walkIds);
 
-                List<WalkSummaryDTO.WalkSummary> walkSummaries = WalkSummaryDTO.WalkSummary.from(walks, walkPathsList);
-                DailyWalkSummaryResponse dailyWalkSummaries = DailyWalkSummaryResponse.of(walkSummaries,
-                                DailyRequestDTO.toDate());
-                return dailyWalkSummaries;
-        }
+        List<WalkSummaryDTO.WalkSummary> walkSummaries = WalkSummaryDTO.WalkSummary.from(walks, walkPathsList);
+        DailyWalkSummaryResponse dailyWalkSummaries = DailyWalkSummaryResponse.of(walkSummaries,
+                DailyRequestDTO.toDate());
+        return dailyWalkSummaries;
+    }
 
-        public WalkSummaryDTO.MonthlyWalkSummaryResponse getMonthlyWalk(
-                        WalkSummaryDTO.MonthlyWalkSummaryRequest MonthlyRequestDTO) {
-                int year = MonthlyRequestDTO.getYear();
-                int month = MonthlyRequestDTO.getMonth();
+    public WalkSummaryDTO.MonthlyWalkSummaryResponse getMonthlyWalk(
+            WalkSummaryDTO.MonthlyWalkSummaryRequest MonthlyRequestDTO) {
+        int year = MonthlyRequestDTO.getYear();
+        int month = MonthlyRequestDTO.getMonth();
 
-                List<Walk> walks = walkRepository.findAllByPetOwnerMemberIdAndMonth(MonthlyRequestDTO.getMemberId(),
-                                year, month);
-                List<Long> walkIds = walks.stream()
-                                .map(Walk::getId)
-                                .collect(Collectors.toList());
-                List<WalkPaths> walkPathsList = walkPathRepository.findAllByWalkIdIn(walkIds);
+        List<Walk> walks = walkRepository.findAllByPetOwnerMemberIdAndMonth(MonthlyRequestDTO.getMemberId(),
+                year, month);
+        List<Long> walkIds = walks.stream()
+                .map(Walk::getId)
+                .collect(Collectors.toList());
+        List<WalkPaths> walkPathsList = walkPathRepository.findAllByWalkIdIn(walkIds);
 
-                return WalkSummaryDTO.MonthlyWalkSummaryResponse.of(walks, walkPathsList, year, month);
-        }
+        return WalkSummaryDTO.MonthlyWalkSummaryResponse.of(walks, walkPathsList, year, month);
+    }
 
-        public List<WalkPaths> getNearbyWalkPaths(WalkSummaryDTO.NearbyWalkPathsRequest pointDTO) {
+    public List<WalkPaths> getNearbyWalkPaths(WalkSummaryDTO.NearbyWalkPathsRequest pointDTO) {
 
-                // 주변 1km 탐색
-                int maxDistance = 1000;
-                Pageable limit = PageRequest.of(0, 100);
-                Timestamp fromDate = new Timestamp(System.currentTimeMillis() - (30 * 24 * 60 * 60 * 1000L)); // 30일 전
+        // 주변 1km 탐색
+        int maxDistance = 1000;
+        Pageable limit = PageRequest.of(0, 100);
+        Timestamp fromDate = new Timestamp(System.currentTimeMillis() - (30 * 24 * 60 * 60 * 1000L)); // 30일 전
 
-                GeoJsonPoint location = new GeoJsonPoint(pointDTO.getLongitude(), pointDTO.getLatitude());
-                return walkPathRepository.findByLocationNear(location, maxDistance, fromDate, limit);
-        }
+        GeoJsonPoint location = new GeoJsonPoint(pointDTO.getLongitude(), pointDTO.getLatitude());
+        return walkPathRepository.findByLocationNear(location, maxDistance, fromDate, limit);
+    }
+
 }
