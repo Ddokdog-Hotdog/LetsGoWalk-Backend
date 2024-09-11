@@ -86,9 +86,9 @@ public class PostController {
 	@PostMapping("/write")
 	@Operation(summary = "게시글 등록", description = "게시글을 등록합니다.")
 	public ResponseEntity<PostGetDetailResponseDTO> createPost(@ModelAttribute PostWriteRequestDTO dto, 
-	                                                            @RequestPart("images") List<MultipartFile> images,
-	                                                            Principal principal) {
-//	    Long memberId = Long.parseLong(principal.getName()); 
+            												   @RequestPart("images") List<MultipartFile> images,
+                                                               Principal principal) {
+	    Long memberId = Long.parseLong(principal.getName()); 
 	    Post post = postService.createPost(dto, images, principal);
 	    
 	    List<String> imageUrls = post.getMediaUrls().stream()

@@ -155,7 +155,7 @@ public class PostService {
 	
 	// 게시글 등록
 	@Transactional
-	public Post createPost(PostWriteRequestDTO dto, List<MultipartFile> images, Principal principal) {
+    public Post createPost(PostWriteRequestDTO dto, List<MultipartFile> images, Principal principal) {
 		
 		Long memberId = Long.parseLong(principal.getName());
 	    Board board = boardRepository.findById(dto.getBoardid())
