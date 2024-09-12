@@ -55,7 +55,7 @@ public class SecurityConfig {
                                                                 "/api/shop/payments/cancel/**",
                                                                 "/api/shop/payments/fail/**")
                                                 .permitAll()
-                                                // .requestMatchers("api/mypage/pets").hasRole("ADMIN")
+                                                .requestMatchers("api/walks/hotplace").permitAll()
                                                 .anyRequest().authenticated())
                                 // .anyRequest().permitAll())
 

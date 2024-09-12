@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Component
 public class IntersectionFinder {
     private static final double BUFFER_SIZE = 0.00100; // 약 100미터에 해당하는 경도/위도 값
-    private static final int MININUM_POINT = 10;
+    private static final int MINIMUM_POINT = 10;
     private static final int MAXIMUM_POINT = 100;
     private static final GeometryFactory geometryFactory = new GeometryFactory();
 
@@ -61,25 +61,50 @@ public class IntersectionFinder {
     }
 
     private List<Coordinate> filterHotspot(Map<Coordinate, Integer> hotspots) {
-        // 가장 많은 개수를 가진 핫스팟을 찾음
-        Coordinate filtered = hotspots.entrySet().stream()
-                .filter(entry -> entry.getValue() >= MININUM_POINT)
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse(null);
+        // 카운트가 높은 순서로 정렬
+        List<Map.Entry<Coordinate, Integer>> sortedHotspots = new ArrayList<>(hotspots.entrySet());
+        sortedHotspots.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
 
-        // MAXIMUM_POINT 이상인 핫스팟 찾음
-        if (filtered != null) {
-            List<Coordinate> highCountFiltered = hotspots.entrySet().stream()
-                    .filter(entry -> entry.getValue() >= MAXIMUM_POINT)
-                    .map(Map.Entry::getKey)
-                    .collect(Collectors.toList());
-            if (!highCountFiltered.isEmpty()) {
-                return highCountFiltered;
+        List<Coordinate> filteredHotspots = new ArrayList<>();
+        Set<Coordinate> excludedCoordinates = new HashSet<>();
+
+        boolean isFirstHotspot = true;
+
+        // 핫스팟 선정
+        for (Map.Entry<Coordinate, Integer> entry : sortedHotspots) {
+            Coordinate coord = entry.getKey();
+            int count = entry.getValue();
+
+            if (excludedCoordinates.contains(coord)) {
+                continue;
             }
-            return Collections.singletonList(filtered);
+
+            if (isFirstHotspot) {
+                if (count >= MINIMUM_POINT) {
+                    filteredHotspots.add(coord);
+                    isFirstHotspot = false;
+                }
+            } else {
+                if (count >= MAXIMUM_POINT) {
+                    filteredHotspots.add(coord);
+                }
+            }
+
+            if (!filteredHotspots.isEmpty()) {
+                // 현재 핫스팟 주변의 다른 후보들을 제외 목록에 추가
+                for (Map.Entry<Coordinate, Integer> otherEntry : sortedHotspots) {
+                    Coordinate otherCoord = otherEntry.getKey();
+                    if (!coord.equals(otherCoord) && calculateDistance(coord, otherCoord) < BUFFER_SIZE * 2) {
+                        excludedCoordinates.add(otherCoord);
+                    }
+                }
+            }
         }
 
-        return Collections.emptyList();
+        return filteredHotspots;
+    }
+
+    private double calculateDistance(Coordinate c1, Coordinate c2) {
+        return c1.distance(c2);
     }
 }
