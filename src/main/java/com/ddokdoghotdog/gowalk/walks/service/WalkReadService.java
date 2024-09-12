@@ -34,6 +34,11 @@ public class WalkReadService {
     private final WalkRepository walkRepository;
     private final IntersectionFinder intersectionFinder;
 
+    private static final int INIT_DISTANCE = 1000; // 첫 검색 1000m
+    private static final int DISTANCE_INCREASE_INTERVAL = 500; // 늘어날 거리
+    private static final int MAX_DISTANCE = 2000;
+    private static final int RESULT_LIMIT = 100;
+
     public Walk getWalkById(Long walkId) {
         return walkRepository.findWalkWithPetsById(walkId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.WALK_NOT_FOUND));
@@ -77,15 +82,25 @@ public class WalkReadService {
 
         // 주변 1km 탐색
         int maxDistance = 1000;
-        Pageable limit = PageRequest.of(0, 100);
+        Pageable limit = PageRequest.of(0, RESULT_LIMIT);
         Timestamp fromDate = new Timestamp(System.currentTimeMillis() - (30 * 24 * 60 * 60 * 1000L)); // 30일 전
-
         GeoJsonPoint location = new GeoJsonPoint(pointDTO.getLongitude(), pointDTO.getLatitude());
-        return walkPathRepository.findByLocationNear(location, maxDistance, fromDate, limit);
+
+        return searchIncrementalDistance(location, maxDistance, fromDate, limit);
     }
 
     public List<NearbyHotplaceResponse> getNearbyHotspots(NearbyWalkPathsRequest pointDTO) {
         List<WalkPaths> walkPaths = getNearbyWalkPaths(pointDTO);
         return NearbyHotplaceResponse.of(intersectionFinder.findHotspot(walkPaths));
+    }
+
+    private List<WalkPaths> searchIncrementalDistance(GeoJsonPoint location, int curDistance, Timestamp fromDate,
+            Pageable limit) {
+        List<WalkPaths> results = walkPathRepository.findByLocationNear(location, curDistance, fromDate, limit);
+        if (results.isEmpty() && curDistance < MAX_DISTANCE) {
+            return searchIncrementalDistance(location, curDistance + DISTANCE_INCREASE_INTERVAL, fromDate, limit);
+        }
+
+        return results;
     }
 }
