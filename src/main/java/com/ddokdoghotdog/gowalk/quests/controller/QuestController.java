@@ -4,7 +4,6 @@ package com.ddokdoghotdog.gowalk.quests.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,13 +25,15 @@ public class QuestController {
     @GetMapping("")
     @RequiredMemberId
     public List<QuestDTO> getVisibleQuestsAndAchievementsForToday(Long memberId) {
+    	questService.completeQuest(memberId, 1L);
         return questService.getVisibleQuestsAndAchievementsForToday(memberId);
     }
 
+    /*@RequiredMemberId
     @PostMapping("")
-    public void completeQuest(@RequestParam(name = "memberId") Long memberId, @RequestParam(name = "questId") Long questId) {
+    public void completeQuest(@RequestParam(name = "questId") Long questId, Long memberId) {
         questService.completeQuest(memberId, questId);
-    }
+    }*/
 
     @PutMapping("")
     @RequiredMemberId

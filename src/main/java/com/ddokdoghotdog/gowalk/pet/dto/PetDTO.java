@@ -29,7 +29,7 @@ public class PetDTO {
         private Boolean neutering;
         private String profileImageUrl;
 
-        public Pet toEntity(Member member, Breed breed) {
+        public Pet toEntity(Member member, Breed breed, String profileImageUrl) {
             return Pet.builder()
                     .member(member)
                     .breed(breed)

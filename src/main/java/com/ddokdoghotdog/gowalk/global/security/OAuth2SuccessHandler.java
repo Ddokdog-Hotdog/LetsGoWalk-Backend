@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final TokenProvider tokenProvider;
+    
     @Value("${custom.frontUrl}")
     private String baseURL;
 
