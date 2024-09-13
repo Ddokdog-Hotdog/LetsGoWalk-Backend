@@ -30,7 +30,6 @@ import lombok.RequiredArgsConstructor;
 public class PetController {
     private final PetReadService petReadService;
     private final PetWriteService petWriteService;
-    private final MemberService memberService;
 
     @RequiredMemberId
     @GetMapping("")
