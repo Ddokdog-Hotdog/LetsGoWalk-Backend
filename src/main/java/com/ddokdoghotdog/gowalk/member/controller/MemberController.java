@@ -56,11 +56,6 @@ public class MemberController {
         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage, 
         Long memberId) {
 
-    	System.out.println("Nickname: " + memberUpdateDTO.getNickname());
-    	System.out.println("Date of Birth: " + memberUpdateDTO.getDateOfBirth());
-    	System.out.println("Gender: " + memberUpdateDTO.getGender());
-    	System.out.println("Phone Number: " + memberUpdateDTO.getPhoneNumber());
-    	
     	if (memberId == null || memberUpdateDTO == null) {
             return ResponseEntity.badRequest().build();
         }
@@ -87,6 +82,9 @@ public class MemberController {
     @RequiredMemberId
     @GetMapping("/mypage")
     public ResponseEntity<MypageDTO> getMyPage(Long memberId) {
+    	if (memberId == null) {
+            throw new IllegalArgumentException("Member ID must not be null");
+        }
         MypageDTO myPageDTO = memberService.getMyPageInfo(memberId);
         if (myPageDTO == null) {
         	System.out.println("1");

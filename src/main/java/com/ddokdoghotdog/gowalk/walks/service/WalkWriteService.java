@@ -12,7 +12,12 @@ import com.ddokdoghotdog.gowalk.entity.Pet;
 import com.ddokdoghotdog.gowalk.entity.Walk;
 import com.ddokdoghotdog.gowalk.pet.repository.PetRepository;
 import com.ddokdoghotdog.gowalk.quests.service.QuestService;
-import com.ddokdoghotdog.gowalk.walks.dto.WalkDTO;
+import com.ddokdoghotdog.gowalk.walks.dto.WalkDTO.WalkEndRequest;
+import com.ddokdoghotdog.gowalk.walks.dto.WalkDTO.WalkEndResponse;
+import com.ddokdoghotdog.gowalk.walks.dto.WalkDTO.WalkStartRequest;
+import com.ddokdoghotdog.gowalk.walks.dto.WalkDTO.WalkStartResponse;
+import com.ddokdoghotdog.gowalk.walks.dto.WalkDTO.WalkUpdateRequest;
+import com.ddokdoghotdog.gowalk.walks.dto.WalkDTO.WalkUpdateResponse;
 import com.ddokdoghotdog.gowalk.walks.model.WalkPaths;
 import com.ddokdoghotdog.gowalk.walks.model.WalkPaths.PathPoint;
 import com.ddokdoghotdog.gowalk.walks.repository.PetWalkRepository;
@@ -38,7 +43,7 @@ public class WalkWriteService {
     private final PetWalkRepository petWalkRepository;
     private final QuestService questService;
 
-    public WalkDTO.WalkStartResponse startWalk(WalkDTO.WalkStartRequest walkStartDTO)
+    public WalkStartResponse startWalk(WalkStartRequest walkStartDTO)
             throws JsonProcessingException {
 
         List<Pet> pets = petRepository.findAllByIdInAndMemberId(walkStartDTO.getDogs(),
@@ -55,10 +60,10 @@ public class WalkWriteService {
                 walkStartDTO.getLatitude(),
                 walkStartDTO.getLongitude());
         walkRedisService.initPath(walk.getId(), initialLocation);
-        return WalkDTO.WalkStartResponse.of(walk);
+        return WalkStartResponse.of(walk);
     }
 
-    public WalkDTO.WalkUpdateResponse recordWalkPath(WalkDTO.WalkUpdateRequest walkUpdateDTO)
+    public WalkUpdateResponse recordWalkPath(WalkUpdateRequest walkUpdateDTO)
             throws JsonProcessingException {
         Long memberId = walkUpdateDTO.getMemberId();
         Long walkId = walkUpdateDTO.getWalkId();
@@ -68,10 +73,10 @@ public class WalkWriteService {
         walk = updateCalories(walk, walk.getTotalDistance());
         walkRedisService.updateWalkPath(walkId, walkUpdateDTO.getWalkPaths());
 
-        return WalkDTO.WalkUpdateResponse.of(walk);
+        return WalkUpdateResponse.of(walk);
     }
 
-    public WalkDTO.WalkEndResponse endWalk(WalkDTO.WalkEndRequest walkEndDTO) throws JsonProcessingException {
+    public WalkEndResponse endWalk(WalkEndRequest walkEndDTO) throws JsonProcessingException {
         Long memberId = walkEndDTO.getMemberId();
         Long walkId = walkEndDTO.getWalkId();
         Walk walk = walkReadService.getWalkByIdAndMemberId(walkId, memberId);
@@ -97,7 +102,7 @@ public class WalkWriteService {
 
         walkRedisService.cleanupRedisData(walkId);
         validateWalkQuest(walk, memberId);
-        return WalkDTO.WalkEndResponse.of(walk);
+        return WalkEndResponse.of(walk);
     }
 
     private Walk updateDistance(Walk walk, List<WalkPaths.PathPoint> newPathPoints) {
