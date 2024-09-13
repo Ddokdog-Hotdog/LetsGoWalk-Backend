@@ -141,7 +141,7 @@ spring:
                 enable-logging: false
 custom:
     baseUrl: https://api.ddokdoghotdog.shop
-    frontUrl: https://api.ddokdoghotdog.shop
+    frontUrl: https://ddokdoghotdog.shop
     payment:
         successfulURL: https://ddokdoghotdog.shop/shop/payment/complete
         cancelURL: https://ddokdoghotdog.shop/shop/payment/error
