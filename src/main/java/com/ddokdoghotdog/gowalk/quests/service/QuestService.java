@@ -49,33 +49,44 @@ public class QuestService {
         now.set(Calendar.SECOND, 0);
         now.set(Calendar.MILLISECOND, 0);
         
-        for (QuestAchievement achievement : achievementQuest) {
-        	Date targetDate = achievement.getRewardDate(); // 여기에 비교하고 싶은 Date 객체를 설정하세요. 	
-        	Calendar target = Calendar.getInstance();
-            target.setTime(targetDate);
-            target.set(Calendar.HOUR_OF_DAY, 0);
-            target.set(Calendar.MINUTE, 0);
-            target.set(Calendar.SECOND, 0);
-            target.set(Calendar.MILLISECOND, 0);
-            
-        	
-            if (achievement.getRewardDate() == null) {
-                return;
-            }
-            else if (target.equals(now)){
-            	 return;
-            }
-            else{
-            
-            	QuestAchievement realachievement = QuestAchievement.builder()
-                        .member(member)
-                        .quest(quest)
-                        .isRewarded(false)
-                        .rewardDate(null)
-                        .build();
+        if (achievementQuest == null) {
+	        for (QuestAchievement achievement : achievementQuest) {
+	        	Date targetDate = achievement.getRewardDate(); // 여기에 비교하고 싶은 Date 객체를 설정하세요. 	
+	        	Calendar target = Calendar.getInstance();
+	            target.setTime(targetDate);
+	            target.set(Calendar.HOUR_OF_DAY, 0);
+	            target.set(Calendar.MINUTE, 0);
+	            target.set(Calendar.SECOND, 0);
+	            target.set(Calendar.MILLISECOND, 0);
+	            
+	        	
+	            if (achievement.getRewardDate() == null) {
+	                return;
+	            }
+	            else if (target.equals(now)){
+	            	 return;
+	            }
+	            else{
+	            
+	            	QuestAchievement realachievement = QuestAchievement.builder()
+	                        .member(member)
+	                        .quest(quest)
+	                        .isRewarded(false)
+	                        .rewardDate(null)
+	                        .build();
+	
+	                questAchievementRepository.save(realachievement);
+	            }
+	        }
+	    }else {
+        	QuestAchievement realachievement = QuestAchievement.builder()
+                    .member(member)
+                    .quest(quest)
+                    .isRewarded(false)
+                    .rewardDate(null)
+                    .build();
 
-                questAchievementRepository.save(realachievement);
-            }
+            questAchievementRepository.save(realachievement);
         }
         
     }
