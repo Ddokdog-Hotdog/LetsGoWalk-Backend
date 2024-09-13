@@ -39,8 +39,17 @@ public class QuestService {
 
         Quest quest = questRepository.findById(questId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.QUEST_NOT_FOUND));
-
-
+        /*
+        List<QuestAchievement> achievementQuest = questAchievementRepository.findByMemberIdAndQuestId(memberId, questId);
+        Date today = new Date(System.currentTimeMillis());
+        
+        for (QuestAchievement achievement : achievementQuest) {
+            // rewardDate가 null이거나 오늘 날짜와 동일한 경우 함수를 종료
+            if (achievement.getRewardDate() == null || achievement.getRewardDate().equals(today)) {
+                return;
+            }
+        }*/
+        		
         QuestAchievement achievement = QuestAchievement.builder()
                 .member(member)
                 .quest(quest)

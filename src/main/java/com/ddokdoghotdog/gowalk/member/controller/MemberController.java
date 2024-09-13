@@ -56,11 +56,6 @@ public class MemberController {
         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage, 
         Long memberId) {
 
-    	System.out.println("Nickname: " + memberUpdateDTO.getNickname());
-    	System.out.println("Date of Birth: " + memberUpdateDTO.getDateOfBirth());
-    	System.out.println("Gender: " + memberUpdateDTO.getGender());
-    	System.out.println("Phone Number: " + memberUpdateDTO.getPhoneNumber());
-    	
     	if (memberId == null || memberUpdateDTO == null) {
             return ResponseEntity.badRequest().build();
         }

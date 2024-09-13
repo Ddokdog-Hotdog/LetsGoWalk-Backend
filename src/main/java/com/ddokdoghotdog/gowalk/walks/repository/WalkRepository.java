@@ -22,7 +22,7 @@ public interface WalkRepository extends JpaRepository<Walk, Long> {
                         "LEFT JOIN FETCH p.member m " +
                         "LEFT JOIN FETCH p.breed " +
                         "LEFT JOIN FETCH m.role " +
-                        "WHERE w.id = :walkId AND m.id = :memberId AND w.endTime IS NOT NULL")
+                        "WHERE w.id = :walkId AND m.id = :memberId")
         Optional<Walk> findByIdAndMemberId(@Param("walkId") Long walkId,
                         @Param("memberId") Long memberId);
 

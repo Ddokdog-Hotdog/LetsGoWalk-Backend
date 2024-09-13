@@ -15,5 +15,5 @@ public interface WalkPathsRepository extends MongoRepository<WalkPaths, String> 
     List<WalkPaths> findAllByWalkIdIn(List<Long> walkIds);
 
     @Query(value = "{ 'paths.location': { $near: { $geometry: ?0, $maxDistance: ?1 } }, 'paths.recordTime': { $gte: ?2 }}")
-    List<WalkPaths> findByLocationNear(GeoJsonPoint location, int maxDistance, Timestamp fromDate, Pageable pageable);
+    List<WalkPaths> findByLocationNear(GeoJsonPoint location, int maxDistance, Timestamp fromDate, Pageable page);
 }
