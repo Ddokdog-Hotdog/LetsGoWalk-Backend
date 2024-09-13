@@ -12,7 +12,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.ddokdoghotdog.gowalk.global.jwt.TokenAuthenticationFilter;
 import com.ddokdoghotdog.gowalk.global.jwt.TokenExceptionFilter;
-
+import org.springframework.http.HttpMethod;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -40,8 +40,9 @@ public class SecurityConfig {
                                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                                 .authorizeHttpRequests(authorize -> authorize
-                                		
-                                                .requestMatchers("/auth/success","/auth/register","/mypage").authenticated()
+
+                                                .requestMatchers("/auth/success", "/auth/register", "/mypage")
+                                                .authenticated()
 
                                                 .requestMatchers("login/**").permitAll()
                                                 .requestMatchers("/error", "/favicon.ico").permitAll()
@@ -55,7 +56,9 @@ public class SecurityConfig {
                                                 .permitAll()
 
                                                 .requestMatchers("api/walks/hotplace").permitAll()
-
+                                                .requestMatchers(HttpMethod.GET, "/api/post/board/**",
+                                                                "/api/post/{postid}")
+                                                .permitAll()
                                                 .anyRequest().authenticated())
                                 // .anyRequest().permitAll())
 
@@ -73,7 +76,6 @@ public class SecurityConfig {
 
                 return http.build();
         }
-
 
         // @Bean
         // public CorsFilter corsFilter() {

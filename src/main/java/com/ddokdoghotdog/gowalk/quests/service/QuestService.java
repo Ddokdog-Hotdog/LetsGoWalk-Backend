@@ -3,6 +3,7 @@ package com.ddokdoghotdog.gowalk.quests.service;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,25 +40,44 @@ public class QuestService {
 
         Quest quest = questRepository.findById(questId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.QUEST_NOT_FOUND));
-        /*
+        
         List<QuestAchievement> achievementQuest = questAchievementRepository.findByMemberIdAndQuestId(memberId, questId);
-        Date today = new Date(System.currentTimeMillis());
+
+        Calendar now = Calendar.getInstance();
+        now.set(Calendar.HOUR_OF_DAY, 0);
+        now.set(Calendar.MINUTE, 0);
+        now.set(Calendar.SECOND, 0);
+        now.set(Calendar.MILLISECOND, 0);
         
         for (QuestAchievement achievement : achievementQuest) {
-            // rewardDate가 null이거나 오늘 날짜와 동일한 경우 함수를 종료
-            if (achievement.getRewardDate() == null || achievement.getRewardDate().equals(today)) {
+        	Date targetDate = achievement.getRewardDate(); // 여기에 비교하고 싶은 Date 객체를 설정하세요. 	
+        	Calendar target = Calendar.getInstance();
+            target.setTime(targetDate);
+            target.set(Calendar.HOUR_OF_DAY, 0);
+            target.set(Calendar.MINUTE, 0);
+            target.set(Calendar.SECOND, 0);
+            target.set(Calendar.MILLISECOND, 0);
+            
+        	
+            if (achievement.getRewardDate() == null) {
                 return;
             }
-        }*/
-        		
-        QuestAchievement achievement = QuestAchievement.builder()
-                .member(member)
-                .quest(quest)
-                .isRewarded(false)
-                .rewardDate(null)
-                .build();
+            else if (target.equals(now)){
+            	 return;
+            }
+            else{
+            
+            	QuestAchievement realachievement = QuestAchievement.builder()
+                        .member(member)
+                        .quest(quest)
+                        .isRewarded(false)
+                        .rewardDate(null)
+                        .build();
 
-        questAchievementRepository.save(achievement);
+                questAchievementRepository.save(realachievement);
+            }
+        }
+        
     }
     
     public List<Quest> getQuestList() {
