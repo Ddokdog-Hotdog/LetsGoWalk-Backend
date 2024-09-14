@@ -114,6 +114,7 @@ public class PaymentParentService {
     		memberRepository.save(member.toBuilder()
 		        			.point(member.getPoint() + payment.getPointAmount())
 		        			.build());
+    		refundPrice -= payment.getPointAmount();
     		log.info("멤버 테이블 포인트 업데이트 완료");
     	}
     	
