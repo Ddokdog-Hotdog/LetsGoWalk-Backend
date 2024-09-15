@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
+import org.locationtech.jts.geom.Coordinate;
 import com.ddokdoghotdog.gowalk.entity.Walk;
 import com.ddokdoghotdog.gowalk.global.entity.BaseMemberIdDTO;
 import com.ddokdoghotdog.gowalk.walks.model.WalkPaths;
@@ -161,5 +161,23 @@ public class WalkSummaryDTO {
         private double latitude;
         private double longitude;
 
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class NearbyHotplaceResponse {
+        private double lat;
+        private double lng;
+
+        public static List<NearbyHotplaceResponse> of(List<Coordinate> points) {
+            return points.stream()
+                    .map(point -> NearbyHotplaceResponse.builder()
+                            .lat(point.y)
+                            .lng(point.x)
+                            .build())
+                    .collect(Collectors.toList());
+        }
     }
 }

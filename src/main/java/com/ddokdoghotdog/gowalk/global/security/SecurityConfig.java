@@ -9,13 +9,10 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import com.ddokdoghotdog.gowalk.global.jwt.TokenAuthenticationFilter;
 import com.ddokdoghotdog.gowalk.global.jwt.TokenExceptionFilter;
-
+import org.springframework.http.HttpMethod;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -37,14 +34,16 @@ public class SecurityConfig {
                                 .cors().and() // cors 비활성화 -> 프론트와 연결 시 따로 설정 필요
                                 .httpBasic(AbstractHttpConfigurer::disable) // 기본 인증 로그인 비활성화
                                 .formLogin(AbstractHttpConfigurer::disable) // 기본 login form 비활성화
-                                .logout(AbstractHttpConfigurer::disable) // 기본 logout 비활성화
+                                .logout(AbstractHttpConfigurer::disable) // 기본 logout 비활성화s
                                 .headers(c -> c.frameOptions(
                                                 FrameOptionsConfig::disable).disable()) // X-Frame-Options 비활성화
                                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                                 .authorizeHttpRequests(authorize -> authorize
+
                                                 .requestMatchers("/auth/success", "/auth/register", "/mypage")
-                                                .permitAll()
+                                                .authenticated()
+
                                                 .requestMatchers("login/**").permitAll()
                                                 .requestMatchers("/error", "/favicon.ico").permitAll()
                                                 .requestMatchers("/", "/hc", "/env").permitAll()
@@ -55,7 +54,11 @@ public class SecurityConfig {
                                                                 "/api/shop/payments/cancel/**",
                                                                 "/api/shop/payments/fail/**")
                                                 .permitAll()
-                                                // .requestMatchers("api/mypage/pets").hasRole("ADMIN")
+
+                                                .requestMatchers("api/walks/hotplace").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/post/board/**",
+                                                                "/api/post/{postid}")
+                                                .permitAll()
                                                 .anyRequest().authenticated())
                                 // .anyRequest().permitAll())
 

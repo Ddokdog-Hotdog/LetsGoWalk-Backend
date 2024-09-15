@@ -131,10 +131,9 @@ public class PaymentService {
 			throw new BusinessException(ErrorCode.LACK_POINT);
 			
 		}else if(shopOrderRequestDTO.getPoint() > 0) {
-			member.toBuilder()
-			.point(member.getPoint() - shopOrderRequestDTO.getPoint())
-			.build();
-			memberRepository.save(member);
+			memberRepository.save(member.toBuilder()
+					.point(member.getPoint() - shopOrderRequestDTO.getPoint())
+					.build());
 			log.info("회원 테이블에서 포인트 갱신 완료");
 		}
 		

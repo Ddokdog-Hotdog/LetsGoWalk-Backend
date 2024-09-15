@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ddokdoghotdog.gowalk.entity.Breed;
 import com.ddokdoghotdog.gowalk.global.annotation.RequiredMemberId;
@@ -28,7 +30,6 @@ import lombok.RequiredArgsConstructor;
 public class PetController {
     private final PetReadService petReadService;
     private final PetWriteService petWriteService;
-    private final MemberService memberService;
 
     @RequiredMemberId
     @GetMapping("")
@@ -47,8 +48,10 @@ public class PetController {
     }
 
     @PostMapping("")
-    public ResponseEntity<PetDTO.Response> createPet(@RequestBody PetDTO.CreateRequest petCreateRequestDTO) {
-        return new ResponseEntity<>(petWriteService.createPet(petCreateRequestDTO), HttpStatus.CREATED);
+    public ResponseEntity<PetDTO.Response> createPet(@RequestPart PetDTO.CreateRequest petCreateRequestDTO, 
+    		@RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+    	PetDTO.Response response = petWriteService.createPet(petCreateRequestDTO, profileImage);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("")

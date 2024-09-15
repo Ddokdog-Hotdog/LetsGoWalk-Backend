@@ -305,7 +305,7 @@ public class ProductService {
 		}
 		
 		// 주문 요청이 들어온 총 가격과 DB상에 저장돼있는 총 가격이 맞는지 확인
-		if(Integer.parseInt(String.valueOf(totalPrice)) != shopOrderRequestDTO.getTotalAmount()) {
+		if(Integer.parseInt(String.valueOf(totalPrice)) != (shopOrderRequestDTO.getTotalAmount() + shopOrderRequestDTO.getPoint())) {
 			// 틀리다면 가격에 장난질을 한 것임
 			log.info("가격에 장난질하지 마십쇼!!");
 			throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
