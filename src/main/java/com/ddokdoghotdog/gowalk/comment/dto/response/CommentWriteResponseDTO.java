@@ -17,6 +17,7 @@ public class CommentWriteResponseDTO {
 
 	private Long postid;
 	private Long memberid;
+	private String nickname;
     private Long commentid;
     private String profileImageUrl;
     private LocalDateTime createdAt;

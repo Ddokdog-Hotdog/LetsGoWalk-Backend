@@ -44,6 +44,7 @@ public class CommentController {
     	CommentWriteResponseDTO responseDTO = CommentWriteResponseDTO.builder()
     			.postid(dto.getPostid())
                 .memberid(memberId)
+                .nickname(comment.getMember().getNickname())
     			.commentid(dto.getCommentsid())
     			.profileImageUrl(comment.getMember().getProfileImageUrl())
     			.createdAt(dto.getCreatedAt())

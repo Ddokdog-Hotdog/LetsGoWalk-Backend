@@ -78,17 +78,17 @@ public class PostController {
 	
 	@GetMapping("/{postid}")
 	@Operation(summary = "게시글 상세 조회", description = "게시글 상세 내용을 조회합니다.")
-	public ResponseEntity<PostGetDetailResponseDTO> getPostDetail(@PathVariable("postid") Long postid){
-		PostGetDetailResponseDTO postGetDetailResponseDTO = postService.getPostDetails(postid);
+	public ResponseEntity<PostGetDetailResponseDTO> getPostDetail(@PathVariable("postid") Long postid, Long memberid){
+		PostGetDetailResponseDTO postGetDetailResponseDTO = postService.getPostDetails(postid, memberid);
 		return ResponseEntity.ok(postGetDetailResponseDTO);
 	}
     
 	@PostMapping("/write")
 	@Operation(summary = "게시글 등록", description = "게시글을 등록합니다.")
 	public ResponseEntity<PostGetDetailResponseDTO> createPost(@ModelAttribute PostWriteRequestDTO dto, 
-	                                                            @RequestPart("images") List<MultipartFile> images,
-	                                                            Principal principal) {
-//	    Long memberId = Long.parseLong(principal.getName()); 
+            												   @RequestPart("images") List<MultipartFile> images,
+                                                               Principal principal) {
+	    Long memberId = Long.parseLong(principal.getName()); 
 	    Post post = postService.createPost(dto, images, principal);
 	    
 	    List<String> imageUrls = post.getMediaUrls().stream()
