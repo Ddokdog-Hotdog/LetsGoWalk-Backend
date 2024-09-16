@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CommentWriteRequestDTO {
 
-    private Long postid;
+    private Long postId;
     private String contents;
     private Long commentsid; // 댓글이면 null, 답글이면 해당 댓글의 ID
     private LocalDateTime createdAt;
