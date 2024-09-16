@@ -37,7 +37,7 @@ public class CommentService {
 	// 댓글 작성
 	public Comment createComment(CommentWriteRequestDTO dto, Long memberId) {
 		
-		Post post = postRepository.findByIdAndMemberId(dto.getPostid(), memberId)
+		Post post = postRepository.findByIdAndMemberId(dto.getPostId(), memberId)
 	            .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 		
 		Comment parentComment = null;

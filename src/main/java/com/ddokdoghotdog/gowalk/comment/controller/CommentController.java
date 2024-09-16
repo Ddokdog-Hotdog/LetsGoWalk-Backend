@@ -42,7 +42,7 @@ public class CommentController {
     	Comment comment = commentService.createComment(dto, memberId);
     	
     	CommentWriteResponseDTO responseDTO = CommentWriteResponseDTO.builder()
-    			.postid(dto.getPostid())
+    			.postid(dto.getPostId())
                 .memberid(memberId)
                 .nickname(comment.getMember().getNickname())
     			.commentid(dto.getCommentsid())
