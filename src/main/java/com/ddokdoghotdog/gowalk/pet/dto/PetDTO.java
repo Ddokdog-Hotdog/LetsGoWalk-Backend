@@ -51,6 +51,8 @@ public class PetDTO {
         private Long petId;
         private Long breedId;
         private String name;
+        private Date dateOfBirth;
+        private String gender;
         private Double weight;
         private Boolean neutering;
         private String profileImageUrl;

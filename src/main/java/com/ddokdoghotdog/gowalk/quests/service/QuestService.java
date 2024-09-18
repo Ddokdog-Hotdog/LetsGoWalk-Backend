@@ -60,11 +60,12 @@ public class QuestService {
 	    		Date rewardDate =achievement.getRewardDate();
 	    		System.out.println(rewardDate);
 	    		System.out.println(todaySqlDate);
-	    		LocalDate rewardLocalDate = rewardDate.toLocalDate(); // sql.Date를 LocalDate로 변환
 	            if (achievement.getRewardDate() == null) {
 	            	System.out.println(1);
 	            	break;
-	            }else if (todayLocalDate.equals(rewardLocalDate)) {
+	            }
+	            LocalDate rewardLocalDate = rewardDate.toLocalDate(); // sql.Date를 LocalDate로 변환
+	            if (todayLocalDate.equals(rewardLocalDate)) {
 	            	System.out.println(2);
 	            	break;
 	            }
