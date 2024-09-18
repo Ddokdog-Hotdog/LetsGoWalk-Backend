@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import com.ddokdoghotdog.gowalk.auth.repository.MemberRepository;
 import com.ddokdoghotdog.gowalk.comment.dto.request.CommentDeleteRequestDTO;
 import com.ddokdoghotdog.gowalk.comment.dto.request.CommentEditRequestDTO;
 import com.ddokdoghotdog.gowalk.comment.dto.request.CommentWriteRequestDTO;
@@ -17,6 +18,7 @@ import com.ddokdoghotdog.gowalk.global.exception.BusinessException;
 import com.ddokdoghotdog.gowalk.global.exception.ErrorCode;
 import com.ddokdoghotdog.gowalk.notification.NotificationRepository;
 import com.ddokdoghotdog.gowalk.notification.dto.NotificationDTO;
+import com.ddokdoghotdog.gowalk.notification.service.NotificationService;
 import com.ddokdoghotdog.gowalk.post.repository.PostRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -33,12 +35,17 @@ public class CommentService {
 	private final RabbitTemplate rabbitTemplate;
 	private final ObjectMapper objectMapper;
 	private final NotificationRepository notificationRepository;
+	private final NotificationService notificationService;
+	private final MemberRepository memberRepository;
 	
 	// 댓글 작성
 	public Comment createComment(CommentWriteRequestDTO dto, Long memberId) {
 		
-		Post post = postRepository.findByIdAndMemberId(dto.getPostId(), memberId)
+		Post post = postRepository.findById(dto.getPostId())
 	            .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+		
+		Member commenter = memberRepository.findById(memberId)
+	            .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 		
 		Comment parentComment = null;
 		if (dto.getCommentsid() != null) {
@@ -47,7 +54,7 @@ public class CommentService {
 		}
 
 		Comment comment = Comment.builder()
-				.member(post.getMember())
+				.member(commenter)
 				.post(post)
 				.contents(dto.getContents())
 				.parentComment(parentComment)
@@ -55,20 +62,33 @@ public class CommentService {
 
 		commentRepository.save(comment);
 		
-		// 게시글을 쓴 사람에게 알림 보내는 로직
-		Member postOwner = post.getMember();  // 게시글 작성자
-		String notificationMessage = String.format("New comment on your post '%s' by %s: %s",
-		                                           post.getTitle(), comment.getMember().getNickname(), comment.getContents());
+//		// 게시글을 쓴 사람에게 알림 보내는 로직
+//		Member postOwner = post.getMember();  // 게시글 작성자
+//		String notificationMessage = String.format("New comment on your post '%s' by %s: %s",
+//		                                           post.getTitle(), comment.getMember().getNickname(), comment.getContents());
+//
+//		NotificationDTO messageDTO = new NotificationDTO(
+//		    post.getId(),
+//		    comment.getMember().getId(),
+//		    comment.getMember().getNickname(),
+//		    comment.getContents()
+//		);
+//
+//		sendNotification(messageDTO, postOwner.getId());
+//		saveNotification(messageDTO, postOwner);
+		
+		Member postOwner = post.getMember();
+		if (!postOwner.getId().equals(memberId)) {  // 게시물의 소유자와 댓글 작성자가 다를 경우 알림
+	        NotificationDTO notificationDTO = new NotificationDTO(
+	            post.getId(),
+	            comment.getMember().getId(),
+	            comment.getMember().getNickname(),
+	            comment.getContents()
+	        );
 
-		NotificationDTO messageDTO = new NotificationDTO(
-		    post.getId(),
-		    comment.getMember().getId(),
-		    comment.getMember().getNickname(),
-		    comment.getContents()
-		);
-
-		sendNotification(messageDTO, postOwner.getId());
-		saveNotification(messageDTO, postOwner);
+	        notificationService.sendNotification(notificationDTO, postOwner.getId());
+	        notificationService.saveNotification(notificationDTO, postOwner);
+	    }
 
 		return comment;
 	}
