@@ -28,6 +28,8 @@ public class PetReadService {
     }
 
     public Pet getPetByIdAndMemberId(Long id, Long memberId) {
+    	System.out.println(id);
+    	System.out.println(memberId);
         return petRepository.findByIdAndMemberId(id, memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PET_NOT_FOUND));
     }

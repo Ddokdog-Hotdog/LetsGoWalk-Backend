@@ -36,11 +36,16 @@ public class PetWriteService {
     };
 
     @Transactional
-    public PetDTO.Response updatePet(PetDTO.Update petUpdateRequsetDTO) {
-        Pet pet = petReadService.getPetByIdAndMemberId(petUpdateRequsetDTO.getPetId(),
-                petUpdateRequsetDTO.getMemberId());
-        Breed breed = petReadService.getBreedById(petUpdateRequsetDTO.getBreedId());
-        pet.updatePet(petUpdateRequsetDTO, breed);
+    public PetDTO.Response updatePet(PetDTO.Update petUpdateRequestDTO, MultipartFile profileImage) {
+        Pet pet = petReadService.getPetByIdAndMemberId(petUpdateRequestDTO.getPetId(),
+        		petUpdateRequestDTO.getMemberId());
+        Breed breed = petReadService.getBreedById(petUpdateRequestDTO.getBreedId());
+        
+        String profileImageUrl = pet.getProfileImageUrl(); // Keep the current URL if no new image is provided
+        if (profileImage != null && !profileImage.isEmpty()) {
+            profileImageUrl = s3Service.uploadFile(profileImage, "pets");
+        }
+        pet.updatePet(petUpdateRequestDTO, breed, profileImageUrl);
         petRepository.save(pet);
 
         return PetDTO.Response.of(pet);

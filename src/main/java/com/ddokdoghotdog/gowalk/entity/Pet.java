@@ -61,11 +61,13 @@ public class Pet extends BaseTimeEntity {
     @Column(name = "profileimageurl")
     private String profileImageUrl;
 
-    public void updatePet(PetDTO.Update petDTO, Breed breed) {
+    public void updatePet(PetDTO.Update updateDto, Breed breed, String profileImageUrl) {
+        this.name = updateDto.getName();
         this.breed = breed;
-        this.name = petDTO.getName();
-        this.weight = petDTO.getWeight();
-        this.neutering = petDTO.getNeutering();
-        this.profileImageUrl = petDTO.getProfileImageUrl();
+        this.dateOfBirth = updateDto.getDateOfBirth();
+        this.gender = updateDto.getGender();
+        this.weight = updateDto.getWeight();
+        this.neutering = updateDto.getNeutering();
+        this.profileImageUrl = profileImageUrl; // Always update with the provided profileImageUrl
     }
 }
