@@ -3,9 +3,7 @@ package com.ddokdoghotdog.gowalk.quests.service;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -43,42 +41,11 @@ public class QuestService {
         
         List<QuestAchievement> achievementQuest = questAchievementRepository.findByMemberIdAndQuestId(memberId, questId);
 
-        Calendar now = Calendar.getInstance();
-        now.set(Calendar.HOUR_OF_DAY, 0);
-        now.set(Calendar.MINUTE, 0);
-        now.set(Calendar.SECOND, 0);
-        now.set(Calendar.MILLISECOND, 0);
-        
-        if (achievementQuest == null) {
-	        for (QuestAchievement achievement : achievementQuest) {
-	        	Date targetDate = achievement.getRewardDate(); // 여기에 비교하고 싶은 Date 객체를 설정하세요. 	
-	        	Calendar target = Calendar.getInstance();
-	            target.setTime(targetDate);
-	            target.set(Calendar.HOUR_OF_DAY, 0);
-	            target.set(Calendar.MINUTE, 0);
-	            target.set(Calendar.SECOND, 0);
-	            target.set(Calendar.MILLISECOND, 0);
-	            
-	        	
-	            if (achievement.getRewardDate() == null) {
-	                return;
-	            }
-	            else if (target.equals(now)){
-	            	 return;
-	            }
-	            else{
-	            
-	            	QuestAchievement realachievement = QuestAchievement.builder()
-	                        .member(member)
-	                        .quest(quest)
-	                        .isRewarded(false)
-	                        .rewardDate(null)
-	                        .build();
-	
-	                questAchievementRepository.save(realachievement);
-	            }
-	        }
-	    }else {
+        long currentTimeMillis = System.currentTimeMillis();
+        Date todaySqlDate = new Date(currentTimeMillis);
+        LocalDate todayLocalDate = todaySqlDate.toLocalDate(); 
+ 
+        if (achievementQuest.isEmpty()) {
         	QuestAchievement realachievement = QuestAchievement.builder()
                     .member(member)
                     .quest(quest)
@@ -87,6 +54,34 @@ public class QuestService {
                     .build();
 
             questAchievementRepository.save(realachievement);
+	    }else {
+	    	for (QuestAchievement achievement : achievementQuest) {
+	    		
+	    		Date rewardDate =achievement.getRewardDate();
+	    		System.out.println(rewardDate);
+	    		System.out.println(todaySqlDate);
+	    		LocalDate rewardLocalDate = rewardDate.toLocalDate(); // sql.Date를 LocalDate로 변환
+	            if (achievement.getRewardDate() == null) {
+	            	System.out.println(1);
+	            	break;
+	            }else if (todayLocalDate.equals(rewardLocalDate)) {
+	            	System.out.println(2);
+	            	break;
+	            }
+	            else{
+	            	System.out.println(3);
+	            	QuestAchievement realachievement = QuestAchievement.builder()
+	                        .member(member)
+	                        .quest(quest)
+	                        .isRewarded(false)
+	                        .rewardDate(null)
+	                        .build();
+	
+	                questAchievementRepository.save(realachievement);
+	                break;
+	            }
+	        }
+	
         }
         
     }
@@ -96,46 +91,39 @@ public class QuestService {
     }
  
     public List<QuestDTO> getVisibleQuestsAndAchievementsForToday(Long memberId) {
-    	 LocalDate today = LocalDate.now();
+    	long currentTimeMillis = System.currentTimeMillis();
+        Date todaySqlDate = new Date(currentTimeMillis);
+        LocalDate today = todaySqlDate.toLocalDate(); 
 
         List<Quest> visibleQuests = questRepository.findByIsVisibleTrue();
         List<QuestAchievement> achievements = questAchievementRepository.findByMemberId(memberId);
 
         return visibleQuests.stream()
-            .map(quest -> {
-                Optional<QuestAchievement> optionalAchievement = achievements.stream()
-                    .filter(a -> a.getQuest().getId().equals(quest.getId()))
-                    .findFirst();
+                .map(quest -> {
+                    List<QuestAchievement> questAchievements = achievements.stream()
+                        .filter(a -> a.getQuest().getId().equals(quest.getId()))
+                        .collect(Collectors.toList());
 
-                boolean isCompleted = optionalAchievement.isPresent();
-                boolean isRewarded = false;
+                    boolean isCompleted = !questAchievements.isEmpty();
+                    boolean isRewarded = questAchievements.stream()
+                        .anyMatch(a -> a.getRewardDate() != null && today.equals(a.getRewardDate().toLocalDate()));
 
-                if (isCompleted) {
-                    QuestAchievement achievement = optionalAchievement.get();
-                    // rewardDate가 null이 아니고 오늘인 경우 보상이 이루어짐
-                    if (achievement.getRewardDate() != null) {
-                        LocalDate rewardDate = achievement.getRewardDate().toLocalDate();
-                        if (today.equals(rewardDate)) {
-                            isRewarded = true;
-                        }
-                    }
-                }
-
-                return QuestDTO.builder()
-                    .questId(quest.getId())
-                    .questName(quest.getName())
-                    .description(quest.getDescription())
-                    .questPoint(quest.getAchievementPoints().intValue())
-                    .completed(isCompleted)
-                    .isReward(isRewarded)
-                    .build();
-            })
-            .collect(Collectors.toList());
+                    return QuestDTO.builder()
+                        .questId(quest.getId())
+                        .questName(quest.getName())
+                        .description(quest.getDescription())
+                        .questPoint(quest.getAchievementPoints().intValue())
+                        .completed(isCompleted)
+                        .isReward(isRewarded)
+                        .build();
+                })
+                .collect(Collectors.toList());
 
     }
 
     public List<QuestAchievementDTO> getQuestAchievementsForToday(Long memberId) {
-        Date today = new Date(System.currentTimeMillis());
+    	long currentTimeMillis = System.currentTimeMillis();
+        Date today = new Date(currentTimeMillis);
         
         List<QuestAchievement> achievements = questAchievementRepository.findByMemberIdAndRewardDate(memberId, today);
 

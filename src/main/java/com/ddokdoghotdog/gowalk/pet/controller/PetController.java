@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ddokdoghotdog.gowalk.entity.Breed;
 import com.ddokdoghotdog.gowalk.global.annotation.RequiredMemberId;
-import com.ddokdoghotdog.gowalk.member.service.MemberService;
 import com.ddokdoghotdog.gowalk.pet.Service.PetReadService;
 import com.ddokdoghotdog.gowalk.pet.Service.PetWriteService;
 import com.ddokdoghotdog.gowalk.pet.dto.PetDTO;
@@ -36,10 +36,19 @@ public class PetController {
     public ResponseEntity<List<PetDTO.Response>> getPetsByMember(Long memberId) {
         return new ResponseEntity<>(petReadService.getPetsByMemberId(memberId), HttpStatus.OK);
     }
-
+/*
     @GetMapping("/breeds")
     public ResponseEntity<List<Breed>> getBreeds() {
         return new ResponseEntity<>(petReadService.getBreedList(), HttpStatus.OK);
+    }*/
+    
+    @GetMapping("/breeds")
+    public ResponseEntity<List<Breed>> getBreeds(@RequestParam(required = false) String search) {
+        if (search != null && !search.isEmpty()) {
+            return new ResponseEntity<>(petReadService.getBreedListFiltered(search), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(petReadService.getBreedList(), HttpStatus.OK);
+        }
     }
 
     @GetMapping("/profile/{petId}")
