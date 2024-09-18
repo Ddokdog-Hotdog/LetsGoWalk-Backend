@@ -49,4 +49,8 @@ public class PetReadService {
     public Breed getBreedByName(String name) {
         return breedRepository.findByName(name).orElseThrow(() -> new BusinessException(ErrorCode.BREED_NOT_FOUND));
     }
+    
+    public List<Breed> getBreedListFiltered(String search) {
+        return breedRepository.findByNameContainingIgnoreCase(search);
+    }
 }
