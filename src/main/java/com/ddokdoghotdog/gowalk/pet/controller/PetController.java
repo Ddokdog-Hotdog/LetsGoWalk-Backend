@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -50,6 +49,16 @@ public class PetController {
             return new ResponseEntity<>(petReadService.getBreedList(), HttpStatus.OK);
         }
     }
+    
+    @GetMapping("/breeds/{breedId}")
+    public ResponseEntity<Breed> getBreedById(@PathVariable("breedId") Long breedId) {
+        Breed breed = petReadService.getBreedById(breedId);
+        if (breed != null) {
+            return new ResponseEntity<>(breed, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
     @GetMapping("/profile/{petId}")
     public ResponseEntity<PetDTO.Response> getPetById(@PathVariable("petId") Long petId) {
@@ -64,8 +73,12 @@ public class PetController {
     }
 
     @PutMapping("")
-    public ResponseEntity<PetDTO.Response> updatePet(@RequestBody PetDTO.Update petUpdateRequsetDTO) {
-        return new ResponseEntity<>(petWriteService.updatePet(petUpdateRequsetDTO), HttpStatus.ACCEPTED);
+    public ResponseEntity<PetDTO.Response> updatePet(@RequestPart("petUpdateRequestDTO") PetDTO.Update petUpdateRequestDTO,
+    	    @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+    	System.out.println(petUpdateRequestDTO.getPetId());
+    	PetDTO.Response response = petWriteService.updatePet(petUpdateRequestDTO, profileImage);
+    	    
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 
     @RequiredMemberId
